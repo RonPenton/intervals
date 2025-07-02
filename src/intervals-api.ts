@@ -11,15 +11,14 @@ export type ICUActivity = Required<paths['/api/v1/athlete/{id}/activities']['get
 export async function getRides(
     athleteId = '0'
 ) {
-
     const path = '/api/v1/athlete/{id}/activities';
 
     type Get = paths[typeof path]['get'];
     type Query = Get['parameters']['query'];
 
-    // 6 weeks ago
+    const weeksToGet = 3;
     const query: Query = {
-        oldest: new Date(new Date().getTime() - 6 * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        oldest: new Date(new Date().getTime() - weeksToGet * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }
 
 

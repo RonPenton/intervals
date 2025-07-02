@@ -13,13 +13,14 @@ export async function sendGptMessage(messages: AIConversation): Promise<string |
         model: "gpt-4o",
         messages,
         //            max_completion_tokens: 150,
-        temperature: 0.3,
+        temperature: 0,
+        top_p: 1,
     });
 
     console.log("Received completion from OpenAI.");
 
     fs.writeFileSync('gpt-response.json', JSON.stringify({
-        messages, 
+        messages,
         completion
     }, null, 2));
 
@@ -37,7 +38,7 @@ export function loadPrompt(
     }
 
     let contents = fs.readFileSync(file, 'utf8').trim();
-    for(const key in data) {
+    for (const key in data) {
         contents = contents.replace(new RegExp(`{${key}}`, 'g'), data[key]);
     }
 
