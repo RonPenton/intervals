@@ -118,17 +118,11 @@ Any extra context that may help planning:
 Return a Markdown table containing the recommended schedule for plan period. 
 
 ```markdown
-| Date       | Time (min)        | Distance Range   | Normalized Power Range | Nutrition            | Calorie Breakdown    | Notes                     |
-|------------|-------------------|------------------|------------------------|----------------------|----------------------|---------------------------|
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-| <day>      | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | <x + y = z>          | Example workout note      |
-|------------|-------------------|------------------|------------------------|----------------------|----------------------|---------------------------|
-| TOTALS     | <total time>      | <total miles>    |                        |                      |                      |                           |
+| Date       | Time (hours)      | Distance Range   | Normalized Power Range | Nutrition            | Notes                     |
+|------------|-------------------|------------------|------------------------|----------------------|---------------------------|
+| Mon 6/30   | <approx time>     | x-y miles        | XXX–YYY W              | <Food Amount>        | Example workout note      |
+|------------|-------------------|------------------|------------------------|----------------------|---------------------------|
+| TOTALS     | <total time>      | <total miles>    |                        |                      |                           |
 ```
 
 After the schedule, provide a paragraph explaining your rationale. Discuss:

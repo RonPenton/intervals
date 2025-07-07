@@ -1,4 +1,4 @@
-import { ICUActivity } from "./intervals-api";
+import { ICUActivity, ICUWellness } from "./intervals-api";
 
 export function pruneActivityFields(record: ICUActivity) {
     const {
@@ -14,8 +14,8 @@ export function pruneActivityFields(record: ICUActivity) {
         average_temp,
         start_date_local,
         icu_intensity,
-        // icu_atl,
-        // icu_ctl
+        icu_atl,
+        icu_ctl
     } = record;
 
     const hours = Math.floor(moving_time / 3600);
@@ -40,8 +40,30 @@ export function pruneActivityFields(record: ICUActivity) {
         calories,
         temperature: celsiusToFahrenheit(average_temp) + 'F',
         date: start_date_local.split('T')[0],
-        intensityFactor: Number(icu_intensity.toFixed(0)),
-        // fatigue: Number(icu_atl.toFixed(0)),
-        // fitness: Number(icu_ctl.toFixed(0))
+        intensityFactor: Number(icu_intensity.toFixed(2)),
+        fatigue: Number(icu_atl.toFixed(2)),
+        fitness: Number(icu_ctl.toFixed(2))
     };
 }
+
+export function pruneWellnessFields(record: ICUWellness) {
+    const {
+        id,
+        atl,
+        atlLoad,
+        ctl,
+        ctlLoad,
+        rampRate
+    } = record;
+
+    return {
+        date: id,
+        fitness: Number(ctl.toFixed(2)),
+        fatigue: Number(atl.toFixed(2)),
+        fitnessLoad: Number(ctlLoad.toFixed(2)),
+        fatigueLoad: Number(atlLoad.toFixed(2)),
+        rampRate: Number(rampRate.toFixed(2))
+    };
+}
+
+export type Wellness = ReturnType<typeof pruneWellnessFields>;
