@@ -35,6 +35,7 @@ export function pruneActivityFields(record: ICUActivity) {
         normalizedWatts: icu_weighted_avg_watts,
         miles: Number(metersToMiles(distance)),
         duration: formattedMovingTime,
+        hours: moving_time / 3600,
         elevation: metersToFeet(total_elevation_gain) + 'ft',
         mph: Number(mpsToMph(average_speed)),
         calories,
@@ -66,4 +67,5 @@ export function pruneWellnessFields(record: ICUWellness) {
     };
 }
 
+export type Activity = ReturnType<typeof pruneActivityFields>;
 export type Wellness = ReturnType<typeof pruneWellnessFields>;

@@ -17,7 +17,6 @@ export const getMonday = (date: Temporal.PlainDate) => {
 };
 
 export const days = (startDate: Temporal.PlainDate) => {
-    console.log('Start date:', startDate);
     return {
         getDay: (offset: number) => {
             const newDate = startDate.add(new Temporal.Duration(0, 0, 0, offset));
@@ -31,8 +30,6 @@ export const days = (startDate: Temporal.PlainDate) => {
                 day = Temporal.PlainDate.from(day);
             }
             const diff = startDate.until(day);
-            console.log('Diff:', diff.days);
-
             return diff.days;
         }
     }

@@ -3,14 +3,14 @@ import fs from 'fs';
 import { getRides, getWellness } from './intervals-api';
 import { pruneActivityFields, pruneWellnessFields } from './intervals-transformers';
 import { loadPrompt, sendGptMessage } from './openai';
-import { computeFatigue, computeFitness, computeRequiredTrainingLoad, ScheduleRecord } from './training';
+import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoad, computeTargetRides, computeTrainingLoadForRide, getZoneForPower, ScheduleRecord, zonesToStrings } from './training';
 import { addDays, days, getMonday, getPastDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
+import { computeScheduleFromRides, computeTrainingLoads, setSchedule } from './schedule';
 
 const bullet = (text: string) => `- ${text}`;
 
 const oneWeek = Temporal.Duration.from({ days: 7 });
-const oneDay = Temporal.Duration.from({ days: 1 });
 
 async function go() {
     console.log('Fetching rides from Intervals.icu...');
@@ -27,14 +27,13 @@ async function go() {
 
     // set this to true if it's like Saturday or Sunday night and want the next
     // week instead of the current week. 
-    const currentWeekIsDone = true;
-    const weeks = 1;
+    const currentWeekIsDone = false;
+    const weeks = 3;
 
 
     const daysToAdd = (weeks * 7) - 1;
 
     const today = getToday();
-    const yesterday = today.add(new Temporal.Duration(0, 0, 0, -1));
     const monday = getMonday(today);
     const startDT = currentWeekIsDone ? monday.add(oneWeek) : monday;
     const endDT = addDays(startDT, daysToAdd);
@@ -42,46 +41,36 @@ async function go() {
     const startDate = startDT.toString();
     const endDate = endDT.toString();
 
-    const { getDay, offset } = days(startDT);
-
-
     console.log(`Start date: ${startDate}, End date: ${endDate}, Days to add: ${daysToAdd}, Monday: ${getMonday(today)}`);
 
-    const wellnessToday = wellness.find(x => x.date === today.toString());
-    const workoutToday = transformed.find(x => x.date === today.toString());
+    const schedules = computeScheduleFromRides(
+        transformed,
+        wellness,
+        startDT,
+        today,
+        !currentWeekIsDone,
+        1, 
+        daysToAdd
+    );
 
-    let fitness = workoutToday?.fitness ?? wellnessToday?.fitness ?? 0;
-    let fatigue = workoutToday?.fatigue ?? wellnessToday?.fatigue ?? 0;
+    setSchedule(schedules, { date: '2025-07-07', form: -5 });
+    setSchedule(schedules, { date: '2025-07-08', form: -13 });
+    setSchedule(schedules, { date: '2025-07-09', form: -13 });
+    setSchedule(schedules, { date: '2025-07-10', form: -15 });
+    setSchedule(schedules, { date: '2025-07-11', form: 0 });
+    setSchedule(schedules, { date: '2025-07-12', form: -20 });
+    setSchedule(schedules, { date: '2025-07-13', form: -20 });
 
-    let day = yesterday;
-    let flipped = false;
-    const forms = [];
-    do {
-        if (day.toString() === endDate) { flipped = true; }
-        const form = fitness - fatigue;
-        forms.push(`${day}: ${form.toFixed(2)} (${fitness.toFixed(2)} - ${fatigue.toFixed(2)})`);
-        fitness = computeFitness(fitness, 0);
-        fatigue = computeFatigue(fatigue, 0);
+    computeTrainingLoads(schedules, transformed[0].currentFtp);
 
-        day = day.add(oneDay);
-    } while (!flipped);
-
-    // const a = computeFitness(49.14, 0);
-    // const b = computeFatigue(81.86, 0);
-    // console.log(`Computed fitness: ${a.toFixed(2)}, fatigue: ${b.toFixed(2)}`);
-
-    computeSchedules(daysToAdd, transformed, wellness, getDay, today);
-
-    const a = 48.33;
-    const b = 72.96;
-    const c = computeRequiredTrainingLoad(a, b, -25);
-    console.log(`Required training load: ${c.toFixed(2)}`);
-
-    // console.log('Fitness and Fatigue Form:');
-    // console.log(forms.join('\n'));
-    if (forms) {
-        return;
-    }
+    schedules.forEach(record => {
+        console.log(`- Date: ${record.date}, CTL: ${record.fitness?.toFixed(0)}, ATL: ${record.fatigue?.toFixed(0)}, Form: ${record.form}, Target Training Load: ${record.trainingLoad}`);
+        if (record.rideOptions) {
+            record.rideOptions.forEach(ride => {
+                console.log(`  - Option: Minutes: ~${ride.minutes}, Power: ~${ride.power} W, Zone: ${ride.name}/Z${Math.floor(ride.zone)}`);
+            });
+        }
+    });
 
     const pastDays = getPastDays(today, startDT);
     console.log(`Start date: ${startDate}, End date: ${endDate}`);
@@ -139,131 +128,33 @@ async function go() {
         ...zonesToStrings(zones)
     });
 
-    console.log('Prompt to OpenAI:');
-    console.log(prompt);
 
-    const response = await sendGptMessage([
-        { role: 'system', content: 'You are a cycling coach.' },
-        { role: 'user', content: prompt }
-    ]);
 
-    if (!response) {
-        console.error('No response from OpenAI');
-        return;
-    }
+    // console.log('Prompt to OpenAI:');
+    // console.log(prompt);
 
-    console.log('Response from OpenAI:');
-    console.log(response);
+    // const response = await sendGptMessage([
+    //     { role: 'system', content: 'You are a cycling coach.' },
+    //     { role: 'user', content: prompt }
+    // ]);
+
+    // if (!response) {
+    //     console.error('No response from OpenAI');
+    //     return;
+    // }
+
+    // console.log('Response from OpenAI:');
+    // console.log(response);
 }
 
-const calculateCogganPowerZones = (ftp: number) => {
-    return {
-        zone_1_active_recovery: [0, 0.55 * ftp],
-        zone_2_endurance: [0.55 * ftp, 0.75 * ftp],
-        zone_3_tempo: [0.75 * ftp, 0.90 * ftp],
-        zone_4_lactate_threshold: [0.90 * ftp, 1.05 * ftp],
-        zone_5_vo2_max: [1.05 * ftp, 1.20 * ftp],
-        zone_6_anaerobic_capacity: [1.20 * ftp, 1.50 * ftp],
-        zone_7_neuromuscular_power: [1.50 * ftp, Infinity]
-    } as const;
-}
-
-type Zones = ReturnType<typeof calculateCogganPowerZones>;
-
-const zonesToStrings = (zones: Zones) => {
-    return Object.fromEntries(Object.entries(zones).map(([key, [min, max]]) => {
-        if (max === Infinity) {
-            return [key, `${min.toFixed(0)}+ W`] as const;
-        }
-        return [key, `${min.toFixed(0)}-${max.toFixed(0)} W`] as const;
-    }));
-}
-
-const getZoneForPower = (power: number, zones: Zones) => {
-    for (const [zone, [min, max]] of Object.entries(zones)) {
-        if (power >= min && power < max) {
-            return zone.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-        }
-    }
-    return null;
-}
-
-
-function computeSchedules(
-    daysToAdd: number,
-    transformed: ReturnType<typeof pruneActivityFields>[],
-    wellness: ReturnType<typeof pruneWellnessFields>[],
-    getDay: (offset: number) => { formatted: string; date: Temporal.PlainDate; },
-    today: Temporal.PlainDate
-) {
-    const schedules: ScheduleRecord[] = [];
-    for (let i = -7; i <= daysToAdd; i++) {
-        const day = getDay(i);
-        const date = day.formatted;
-        const ride = transformed.find(x => x.date === date);
-        const wellnessRecord = wellness.find(x => x.date === date);
-
-        const fitness = wellnessRecord?.fitness ?? ride?.fitness ?? 0;
-        const fatigue = wellnessRecord?.fatigue ?? ride?.fatigue ?? 0;
-        const form = fitness - fatigue;
-        schedules.push({
-            offset: i,
-            date: getDay(i).formatted,
-            fitness,
-            fatigue,
-            form,
-            trainingLoad: ride?.trainingLoad
-        });
-    }
-
-    for (let i = 0; i < schedules.length; i++) {
-        const record = schedules[i];
-        if (Temporal.PlainDate.from(record.date).until(today).days > 0) {
-            if (!record.trainingLoad) {
-                record.trainingLoad = 0;
-            }
-        }
-        else if (Temporal.PlainDate.from(record.date).until(today).days < 0) {
-            record.form = undefined;
-            record.fatigue = undefined;
-            record.fitness = undefined;
-        }
-    }
-
-    schedules[7].form = schedules[7].form ?? -5;
-    schedules[8].form = schedules[8].form ?? -10;
-    schedules[9].form = schedules[9].form ?? -15;
-    schedules[10].form = schedules[10].form ?? -20;
-    schedules[11].form = schedules[11].form ?? -10;
-    schedules[12].form = schedules[12].form ?? -30;
-    schedules[13].form = schedules[13].form ?? -15;
-
-
-
-    let fatigue = schedules[0].fatigue ?? 0;
-    let fitness = schedules[0].fitness ?? 0;
-    for (let i = 1; i < schedules.length; i++) {
-        const record = schedules[i];
-        if (record.trainingLoad === undefined) {
-            let tss = computeRequiredTrainingLoad(fitness, fatigue, record.form ?? 0);
-
-            if (tss < 0) { tss = 0; }
-
-            record.trainingLoad = tss;
-            fatigue = computeFatigue(fatigue, tss);
-            fitness = computeFitness(fitness, tss);
-
-            record.fatigue = fatigue;
-            record.fitness = fitness;
-        }
-    }
-
-    console.log('Schedule Records:');
-    schedules.forEach(record => {
-        console.log(`Offset: ${record.offset}, Date: ${record.date}, Fitness: ${record.fitness?.toFixed(2)}, Fatigue: ${record.fatigue?.toFixed(2)}, Form: ${record.form?.toFixed(2)}, Training Load: ${record.trainingLoad}`);
-    });
-
-    return schedules;
-}
 
 void go();
+
+
+// possible rules:
+// - no more than 3 Z3+ rides per week
+// - prioritize Z2 ride volume
+// - avoid z3+ rides on days before long rides
+// - prefer z2 rides after rest days?
+// - z3+ rides after z2 days?
+// - taper back to z2 rides after z3+ rides
