@@ -23,6 +23,7 @@ export type ScheduleFields = {
     maxZone?: number;
     needsRide?: boolean;
     rideOptions?: TargetRide[];
+    zone?: number;
 }
 
 export type ScheduleRecord = ScheduleId & ScheduleDate & ScheduleFields;
@@ -84,6 +85,10 @@ export function computeScheduleFromRides(
             trainingLoad: ride?.trainingLoad
         };
 
+        if(ride) {
+            record.zone = ride.zone;
+        }
+
         if (beforeToday(date)) {
             if (record.trainingLoad === undefined) {
                 record.trainingLoad = 0; // did not ride. 
@@ -117,13 +122,13 @@ export function computeTrainingLoads(
         const record = schedules[i];
         if (record.trainingLoad === undefined) {
 
-            if(!record.form) {
+            if (!record.form) {
                 record.form = 0;
             }
 
             let tss = computeRequiredTrainingLoad(fitness, fatigue, record.form ?? 0);
             tss = Math.round(tss * 10) / 10; // Round to one decimal place
-            if (tss < 20) { tss = 0; }
+            if (tss < 10) { tss = 0; }
 
             if (record.needsRide) {
                 const options = computeTargetRides(ftp, tss, record.minMinutes, record.maxMinutes)
@@ -149,21 +154,11 @@ export function computeTrainingLoads(
     return schedules;
 }
 
-
-// export function computeTargetRidesForSchedules(
-//     schedules: ScheduleRecord[],
-//     ftp: number,
-// ) {
-//     for (const record of schedules) {
-//         if (!record.needsRide || !record.trainingLoad) {
-//             record.rideOptions = [];
-//             continue;
-//         }
-
-//         const options = computeTargetRides(ftp, record.trainingLoad, record.minMinutes, record.maxMinutes)
-//             .filter(o => !record.minZone || o.zone >= record.minZone)
-//             .filter(o => !record.maxZone || o.zone <= record.maxZone);
-
-//         record.rideOptions = options;
-//     }
-// }
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export function getDayOfWeek(date: string | Temporal.PlainDate) {
+    if (typeof date === 'string') {
+        date = Temporal.PlainDate.from(date);
+    }
+    const dayIndex = date.dayOfWeek - 1; // Temporal.PlainDate dayOfWeek is 1-7, we want 0-6
+    return daysOfWeek[dayIndex];
+}

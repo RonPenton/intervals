@@ -1,4 +1,5 @@
 import { ICUActivity, ICUWellness } from "./intervals-api";
+import { getZoneForRide } from "./training";
 
 export function pruneActivityFields(record: ICUActivity) {
     const {
@@ -43,7 +44,8 @@ export function pruneActivityFields(record: ICUActivity) {
         date: start_date_local.split('T')[0],
         intensityFactor: Number(icu_intensity.toFixed(2)),
         fatigue: Number(icu_atl.toFixed(2)),
-        fitness: Number(icu_ctl.toFixed(2))
+        fitness: Number(icu_ctl.toFixed(2)),
+        zone: getZoneForRide(icu_rolling_ftp, icu_weighted_avg_watts)
     };
 }
 

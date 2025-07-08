@@ -1,4 +1,3 @@
-import { ICUActivity } from "./intervals-api";
 import { Activity } from "./intervals-transformers";
 
 export function computeFitness(
@@ -63,13 +62,13 @@ export type TargetRide = TargetCategory & {
 }
 
 export const targetCategories = [
-    { name: "Active Recovery", zone: 1, percentFtp: 50, minMinutes: 45, maxMinutes: 70 },
-    { name: "Recovery Base Miles", zone: 2, percentFtp: 60, minMinutes: 45, maxMinutes: 90 },
+    { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 45, maxMinutes: 70 },
+    { name: "Base", zone: 2, percentFtp: 60, minMinutes: 60, maxMinutes: 90 },
     { name: "Long Ride", zone: 2.5, percentFtp: 73, minMinutes: 120 },
-    { name: "Endurance Base Miles", zone: 2.5, percentFtp: 75, minMinutes: 45, maxMinutes: 120 },
+    { name: "Endurance Base", zone: 2.5, percentFtp: 75, minMinutes: 45, maxMinutes: 120 },
     { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 180 },
     { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 150 },
-    { name: "Lactate Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 60 },
+    { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 60 },
     { name: "VO2 Max", zone: 5, percentFtp: 110, minMinutes: 15, maxMinutes: 60 },
 ] as const;
 
@@ -131,6 +130,21 @@ export const getZoneForPower = (power: number, zones: Zones) => {
             return zone.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
         }
     }
-    return null;
+    throw new Error(`Power ${power} W does not fit in any zone.`);
 }
 
+export const getZoneNumberForPower = (power: number, zones: Zones) => {
+    let i = 1;
+    for (const [zone, [min, max]] of Object.entries(zones)) {
+        if (power >= min && power < max) {
+            return i;
+        }
+        i++;
+    }
+    throw new Error(`Power ${power} W does not fit in any zone.`);
+}
+
+export const getZoneForRide = (ftp: number, np: number): number => {
+    const zones = calculateCogganPowerZones(ftp);
+    return getZoneNumberForPower(np, zones);
+}

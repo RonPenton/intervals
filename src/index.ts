@@ -6,7 +6,7 @@ import { loadPrompt, sendGptMessage } from './openai';
 import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoad, computeTargetRides, computeTrainingLoadForRide, getZoneForPower, ScheduleRecord, zonesToStrings } from './training';
 import { addDays, days, getMonday, getPastDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
-import { computeScheduleFromRides, computeTrainingLoads, setSchedule } from './schedule';
+import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, setSchedule } from './schedule';
 
 const bullet = (text: string) => `- ${text}`;
 
@@ -28,7 +28,7 @@ async function go() {
     // set this to true if it's like Saturday or Sunday night and want the next
     // week instead of the current week. 
     const currentWeekIsDone = false;
-    const weeks = 3;
+    const weeks = 2;
 
 
     const daysToAdd = (weeks * 7) - 1;
@@ -49,33 +49,49 @@ async function go() {
         startDT,
         today,
         !currentWeekIsDone,
-        1, 
+        7,
         daysToAdd
     );
 
-    setSchedule(schedules, { date: '2025-07-07', form: -5 });
-    setSchedule(schedules, { date: '2025-07-08', form: -13 });
-    setSchedule(schedules, { date: '2025-07-09', form: -13 });
-    setSchedule(schedules, { date: '2025-07-10', form: -15 });
-    setSchedule(schedules, { date: '2025-07-11', form: 0 });
-    setSchedule(schedules, { date: '2025-07-12', form: -20 });
-    setSchedule(schedules, { date: '2025-07-13', form: -20 });
+    setSchedule(schedules, { date: '2025-07-07', form: -5 });       // Monday
+    setSchedule(schedules, { date: '2025-07-08', form: -13 });      // Tuesday
+    setSchedule(schedules, { date: '2025-07-09', form: -15 });      // Wednesday
+    setSchedule(schedules, { date: '2025-07-10', form: -15 });      // Thursday
+    setSchedule(schedules, { date: '2025-07-11', form: 0 });        // Friday
+    setSchedule(schedules, { date: '2025-07-12', form: -20 });      // Saturday
+    setSchedule(schedules, { date: '2025-07-13', form: -20 });      // Sunday
+    setSchedule(schedules, { date: '2025-07-14', form: -5 });       // Monday   
+    setSchedule(schedules, { date: '2025-07-15', form: -13 });      // Tuesday
+    setSchedule(schedules, { date: '2025-07-16', form: -13 });      // Wednesday
+    setSchedule(schedules, { date: '2025-07-17', form: -13 });      // Thursday
+    setSchedule(schedules, { date: '2025-07-18', form: -8 });      // Friday
+    setSchedule(schedules, { date: '2025-07-19', form: -20, minMinutes: 150 });      // Saturday    
+    setSchedule(schedules, { date: '2025-07-20', form: -5 });       // Sunday
 
     computeTrainingLoads(schedules, transformed[0].currentFtp);
 
     schedules.forEach(record => {
-        console.log(`- Date: ${record.date}, CTL: ${record.fitness?.toFixed(0)}, ATL: ${record.fatigue?.toFixed(0)}, Form: ${record.form}, Target Training Load: ${record.trainingLoad}`);
-        if (record.rideOptions) {
-            record.rideOptions.forEach(ride => {
-                console.log(`  - Option: Minutes: ~${ride.minutes}, Power: ~${ride.power} W, Zone: ${ride.name}/Z${Math.floor(ride.zone)}`);
-            });
+        const dayOfWeek = getDayOfWeek(record.date);
+
+        const parts = [
+            `${getDayOfWeek(record.date)}, ${record.date}`,,
+            `CTL: ${record.fitness?.toFixed(0)}`,
+            `ATL: ${record.fatigue?.toFixed(0)}`,
+            `Form: ${record.form?.toFixed(0)}`,
+            !record.needsRide ? `TSS: ${record.trainingLoad}` : `Target TSS: ${record.trainingLoad}`,
+            record.zone ? `Zone: ${record.zone}` : null
+        ].filter(x => x !== null).join(', ');
+
+        console.log(`- ${parts}`);
+        if (record.rideOptions && record.rideOptions.length > 0) {
+            const opts = record.rideOptions.map(ride => {
+                return `~${ride.minutes} min ~${ride.power} W, Zone ${Math.floor(ride.zone)} ${ride.name}`;
+            }).join (' | ');
+            console.log(`   - Options: ${opts}`);
         }
     });
 
     const pastDays = getPastDays(today, startDT);
-    console.log(`Start date: ${startDate}, End date: ${endDate}`);
-    console.log(`Past days: ${pastDays.join(', ')}`);
-
     const ftp = transformed[0].currentFtp;
     const zones = calculateCogganPowerZones(ftp);
 
