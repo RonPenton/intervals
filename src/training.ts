@@ -64,8 +64,8 @@ export type TargetRide = TargetCategory & {
 export const targetCategories = [
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 45, maxMinutes: 70 },
     { name: "Base", zone: 2, percentFtp: 60, minMinutes: 60, maxMinutes: 90 },
-    { name: "Long Ride", zone: 2.5, percentFtp: 73, minMinutes: 120 },
-    { name: "Endurance Base", zone: 2.5, percentFtp: 75, minMinutes: 45, maxMinutes: 120 },
+    { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutes: 120 },
+    { name: "Endurance Base", zone: 2.5, percentFtp: 74, minMinutes: 40, maxMinutes: 120 },
     { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 180 },
     { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 150 },
     { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 60 },
@@ -147,4 +147,90 @@ export const getZoneNumberForPower = (power: number, zones: Zones) => {
 export const getZoneForRide = (ftp: number, np: number): number => {
     const zones = calculateCogganPowerZones(ftp);
     return getZoneNumberForPower(np, zones);
+}
+
+export function powerAtDurationPowerLaw(
+    tSec: number,
+    ftp: number,
+    t0Sec = 3600,  // reference: 1 hour
+    k = 0.07       // decay exponent
+): number {
+    if (tSec <= 0) return Infinity;
+    return ftp * Math.pow(tSec / t0Sec, -k);
+}
+
+
+const cogganTable: [number, number][] = [
+    [5, 2.50],
+    [60, 1.75],
+    [300, 1.20],
+    [1200, 1.00],
+    [3600, 0.95],
+    [7200, 0.85],
+    [18000, 0.70],
+];
+
+/**
+ * Estimate sustainable power at a given duration based on FTP using 로그 interpolation.
+ * @param tSec Time in seconds
+ * @param ftp Functional Threshold Power
+ */
+export function powerAtDurationCoggan(tSec: number, ftp: number): number {
+    if (tSec <= 0) return ftp;
+    const table = cogganTable;
+    const t = tSec;
+
+    // If out of table range, extrapolate with end slopes
+    if (t <= table[0][0]) {
+        const [t0, p0] = table[0];
+        return ftp * (p0 / (t0 ** 0));
+    }
+    if (t >= table[table.length - 1][0]) {
+        const [tn, pn] = table[table.length - 1];
+        return ftp * pn;
+    }
+
+    // Find surrounding points
+    let i = 0;
+    while (t > table[i + 1][0]) i++;
+    const [t1, p1] = table[i];
+    const [t2, p2] = table[i + 1];
+    const ratio = (Math.log(t) - Math.log(t1)) / (Math.log(t2) - Math.log(t1));
+    const pct = p1 + (p2 - p1) * ratio;
+    return pct * ftp;
+}
+
+export function powerAtDurationFromPowerCurve(
+    tSec: number,
+    powerCurve: { secs: number[], values: number[] }
+) {
+    if (tSec <= 0) {
+        throw new Error('Time must be greater than 0 seconds');
+    }
+
+    const t = tSec;
+
+    if (t <= powerCurve.secs[0]) {
+        const p0 = powerCurve.values[0];
+        return p0;
+    }
+    if (t >= powerCurve.secs[powerCurve.secs.length - 1]) {
+        const pN = powerCurve.values[powerCurve.values.length - 1];
+        return pN;
+    }
+
+    // Find surrounding points
+    let i = 0;
+    while (t > powerCurve.secs[i + 1]) i++;
+    const t1 = powerCurve.secs[i];
+    const p1 = powerCurve.values[i];
+    const t2 = powerCurve.secs[i + 1];
+    const p2 = powerCurve.values[i + 1];
+
+    const diff1 = Math.abs(t - t1);
+    const diff2 = Math.abs(t - t2);
+    if(diff1 < diff2) {
+        return p1;
+    }
+    return p2;
 }

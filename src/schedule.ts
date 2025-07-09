@@ -15,7 +15,7 @@ export type ScheduleDate = {
 export type ScheduleFields = {
     fitness?: number;
     fatigue?: number;
-    form?: number;
+    form?: number | 'decay';
     trainingLoad?: number;
     minMinutes?: number;
     maxMinutes?: number;
@@ -124,6 +124,14 @@ export function computeTrainingLoads(
 
             if (!record.form) {
                 record.form = 0;
+            }
+            if(record.form === 'decay') {
+                const fit = computeFitness(fitness, 0);
+                const fat = computeFatigue(fatigue, 0);
+                record.form = fit - fat;
+
+                const t = computeRequiredTrainingLoad(fitness, fatigue, record.form);
+                console.log(`Decay form for ${record.date} is ${record.form}, TSS: ${t}`);
             }
 
             let tss = computeRequiredTrainingLoad(fitness, fatigue, record.form ?? 0);
