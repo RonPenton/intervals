@@ -88,6 +88,7 @@ export function estimateClimbTimeFromPowerCurve(
     powerCurve: ICUPowerCurve,
     ftpWatts: number,
     totalMassPounds: number,
+    targetPercentage = 0.95,
     rollingResistance = 0.005,
     dragArea = 0.4,
     airDensity = 1.225
@@ -106,7 +107,7 @@ export function estimateClimbTimeFromPowerCurve(
             airDensity
         );
 
-        const maxPowerAtDuration = powerAtDurationFromPowerCurve(secondsClimbing, powerCurve);
+        const maxPowerAtDuration = powerAtDurationFromPowerCurve(secondsClimbing, powerCurve) * targetPercentage;
         const diff = Math.abs(maxPowerAtDuration - power);
         if (diff < 1) {
             return { power, secondsClimbing };
