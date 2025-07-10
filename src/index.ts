@@ -5,10 +5,9 @@ import { pruneActivityFields, pruneWellnessFields } from './intervals-transforme
 import { addDays, getMonday, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, setSchedule } from './schedule';
+import { computeTrainingLoadRanges, targetCategories } from './training';
 
 export const bullet = (text: string) => `- ${text}`;
-
-const oneWeek = Temporal.Duration.from({ days: 7 });
 
 async function go() {
     console.log('Fetching rides from Intervals.icu...');
@@ -36,7 +35,13 @@ async function go() {
     const startDate = startDT.toString();
     const endDate = endDT.toString();
 
-    console.log(`Start date: ${startDate}, End date: ${endDate}, Days to add: ${daysToAdd}, Monday: ${getMonday(today)}`);
+    // console.log(`Start date: ${startDate}, End date: ${endDate}, Days to add: ${daysToAdd}, Monday: ${getMonday(today)}`);
+
+    const trainingRanges = computeTrainingLoadRanges(targetCategories, 500);
+    console.log('Training load ranges:');
+    Object.entries(trainingRanges).forEach(([name, range]) => {
+        console.log(`- ${name}: ${range[0].toFixed(1)} - ${range[1].toFixed(1)} TSS`);
+    });
 
     const schedules = computeScheduleFromRides(
         transformed,
@@ -48,23 +53,21 @@ async function go() {
         daysToAdd
     );
 
-    //setSchedule(schedules, { date: '2025-07-07', form: -5 });       // Monday
-    //setSchedule(schedules, { date: '2025-07-08', form: -15 });      // Tuesday
-    //setSchedule(schedules, { date: '2025-07-09', form: -18 });      // Wednesday
-    setSchedule(schedules, { date: '2025-07-10', form: -21 });      // Thursday
-    setSchedule(schedules, { date: '2025-07-11', form: 'decay', maxMinutes: 0 });        // Friday
-    setSchedule(schedules, { date: '2025-07-12', form: -20 });      // Saturday
-    setSchedule(schedules, { date: '2025-07-13', form: -20 });      // Sunday
-    setSchedule(schedules, { date: '2025-07-14', form: -10 });       // Monday   
-    setSchedule(schedules, { date: '2025-07-15', form: -13 });      // Tuesday
-    setSchedule(schedules, { date: '2025-07-16', form: -13 });      // Wednesday
-    setSchedule(schedules, { date: '2025-07-17', form: -13 });      // Thursday
-    setSchedule(schedules, { date: '2025-07-18', form: -8 });      // Friday
-    setSchedule(schedules, { date: '2025-07-19', form: -20, minMinutes: 150 });      // Saturday    
-    setSchedule(schedules, { date: '2025-07-20', form: -5 });       // Sunday
+    setSchedule(schedules, { date: '2025-07-10', targetForm: 'D+1' });      // Thursday
+    setSchedule(schedules, { date: '2025-07-11', targetForm: 'D+2' });      // Friday
+    setSchedule(schedules, { date: '2025-07-12', targetTrainingLoad: 10 }); // Saturday
+    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });    // Sunday
+    setSchedule(schedules, { date: '2025-07-14', targetForm: -10 });        // Monday   
+    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });        // Tuesday
+    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });        // Wednesday
+    setSchedule(schedules, { date: '2025-07-17', targetForm: -13 });        // Thursday
+    setSchedule(schedules, { date: '2025-07-18', targetForm: -8 });         // Friday
+    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });// Saturday    
+    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });    // Sunday
 
     computeTrainingLoads(schedules, transformed[0].currentFtp);
 
+    console.log(`Schedule from ${startDate} to ${endDate} (today: ${today.toString()})`);
     schedules.forEach(record => {
         const parts = [
             `${getDayOfWeek(record.date)}, ${record.date}`, ,
@@ -83,8 +86,8 @@ async function go() {
         if (record.rideOptions && record.rideOptions.length > 0) {
             const opts = record.rideOptions.map(ride => {
                 const time = `${Math.floor(ride.minutes / 60)}:${String(ride.minutes % 60).padStart(2, '0')}`;
-                return `~${time} ~${ride.power} W, Zone ${Math.floor(ride.zone)} ${ride.name}`;
-            }).join(' █ ');
+                return `~${time}|~${ride.power}w|Z${Math.floor(ride.zone)}|${ride.name}`;
+            }).join(' ▓ ');
             console.log(`   - ${opts}`);
         }
     });

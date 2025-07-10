@@ -30,6 +30,14 @@ export function computeTrainingLoadForRide(
     ftp: number
 ) {
     const { hours, normalizedWatts } = ride;
+    return computeTrainingLoad(hours, normalizedWatts, ftp);
+}
+
+export function computeTrainingLoad(
+    hours: number,
+    normalizedWatts: number,
+    ftp: number
+) {
     const pow2 = Math.pow(normalizedWatts, 2);
     const ftp2 = Math.pow(ftp, 2);
     const tss = ((hours * pow2) / ftp2) * 100;
@@ -62,22 +70,42 @@ export type TargetRide = TargetCategory & {
 }
 
 export const targetCategories = [
-    { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 45, maxMinutes: 70 },
-    { name: "Base", zone: 2, percentFtp: 60, minMinutes: 60, maxMinutes: 90 },
+    { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 20, maxMinutes: 60 },
+    { name: "Base", zone: 2, percentFtp: 60, minMinutes: 35, maxMinutes: 100 },
     { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutes: 120 },
     { name: "Endurance Base", zone: 2.5, percentFtp: 74, minMinutes: 40, maxMinutes: 120 },
-    { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 180 },
-    { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 150 },
+    { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 150 },
+    { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 120 },
     { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 60 },
     { name: "VO2 Max", zone: 5, percentFtp: 110, minMinutes: 15, maxMinutes: 60 },
 ] as const;
 
 
+export function computeTrainingLoadRanges(
+    targetCategories: readonly TargetCategory[],
+    ftp: number
+) {
+    const ranges: { [key: string]: [number, number] } = {};
+    for (const category of targetCategories) {
+        let low = 0;
+        if (category.minMinutes !== undefined) {
+            low = computeTrainingLoad(category.minMinutes / 60, category.percentFtp / 100 * ftp, ftp);
+        }
+        let high = Infinity;
+        if (category.maxMinutes !== undefined) {
+            high = computeTrainingLoad(category.maxMinutes / 60, category.percentFtp / 100 * ftp, ftp);
+        }
+        ranges[category.name] = [low, high];
+    }
+    return ranges;
+}
+
+
 export function computeTargetRides(
     ftp: number,
     trainingLoadTarget: number,
-    minimumRideMinutes = 40,
-    maximumRideMinutes = 9999999
+    minimumRideMinutes: number,
+    maximumRideMinutes: number
 ) {
     const fn = (category: TargetCategory) => calculateHoursForTargetRide(category, trainingLoadTarget, ftp);
     const rides = targetCategories
@@ -229,7 +257,7 @@ export function powerAtDurationFromPowerCurve(
 
     const diff1 = Math.abs(t - t1);
     const diff2 = Math.abs(t - t2);
-    if(diff1 < diff2) {
+    if (diff1 < diff2) {
         return p1;
     }
     return p2;

@@ -12,15 +12,23 @@ export type ScheduleDate = {
     date: string;
 }
 
+export type Sign = '-' | '+';
+export type Delta = `D${Sign}${number}`;
+
+
 export type ScheduleFields = {
     fitness?: number;
     fatigue?: number;
-    form?: number | 'decay';
+    form?: number;
     trainingLoad?: number;
+
+    targetForm?: number | 'decay' | 'maintain' | Delta;
+    targetTrainingLoad?: number;
     minMinutes?: number;
     maxMinutes?: number;
     minZone?: number;
     maxZone?: number;
+
     needsRide?: boolean;
     rideOptions?: TargetRide[];
     zone?: number;
@@ -85,7 +93,7 @@ export function computeScheduleFromRides(
             trainingLoad: ride?.trainingLoad
         };
 
-        if(ride) {
+        if (ride) {
             record.zone = ride.zone;
         }
 
@@ -99,6 +107,7 @@ export function computeScheduleFromRides(
             record.form = undefined;
             record.fatigue = undefined;
             record.fitness = undefined;
+            record.trainingLoad = undefined;
         }
 
         schedules.push(record);
@@ -116,46 +125,66 @@ export function computeTrainingLoads(
     schedules: ScheduleRecord[],
     ftp: number,
 ) {
+
     let fatigue = schedules[0].fatigue ?? 0;
     let fitness = schedules[0].fitness ?? 0;
     for (let i = 1; i < schedules.length; i++) {
         const record = schedules[i];
-        if (record.trainingLoad === undefined) {
 
-            if (!record.form) {
-                record.form = 0;
+        if (record.trainingLoad === undefined && record.targetTrainingLoad !== undefined) {
+            // desired training load is set by the user, calculate the form. 
+            record.trainingLoad = record.targetTrainingLoad;
+            record.fatigue = computeFatigue(fatigue, record.trainingLoad);
+            record.fitness = computeFitness(fitness, record.trainingLoad);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.form === undefined && record.targetForm !== undefined) {
+            // desired form is set by the user, calculate the training load.
+            if (record.targetForm === 'maintain') {
+                record.form = schedules[i - 1].form ?? 0;
             }
-            if(record.form === 'decay') {
-                const fit = computeFitness(fitness, 0);
-                const fat = computeFatigue(fatigue, 0);
-                record.form = fit - fat;
+            else if (record.targetForm === 'decay') {
+                record.trainingLoad = 0;
+                record.fitness = computeFitness(fitness, 0);
+                record.fatigue = computeFatigue(fatigue, 0);
+                record.form = record.fitness - record.fatigue;
+            }
+            else if (typeof record.targetForm === 'string') {
+                record.form = (schedules[i - 1].form ?? 0) + Number(record.targetForm.substring(1));
+            }
+            else {
+                record.form = record.targetForm;
+            }
+        }
 
-                const t = computeRequiredTrainingLoad(fitness, fatigue, record.form);
-                console.log(`Decay form for ${record.date} is ${record.form}, TSS: ${t}`);
+        if (record.needsRide) {
+            let tss = record.trainingLoad;
+            if (tss === undefined && record.form !== undefined) {
+                tss = computeRequiredTrainingLoad(fitness, fatigue, record.form ?? 0);
+                tss = Math.round(tss * 10) / 10; // Round to one decimal place
+                if (tss < 10) {
+                    console.log(`Warning: Training load for ${record.date} is less than 10 TSS. Setting to 0.`);
+                    tss = 0;
+                }
             }
 
-            let tss = computeRequiredTrainingLoad(fitness, fatigue, record.form ?? 0);
-            tss = Math.round(tss * 10) / 10; // Round to one decimal place
-            if (tss < 10) { tss = 0; }
+            tss = tss ?? 0;
 
-            if (record.needsRide) {
-                const options = computeTargetRides(ftp, tss, record.minMinutes, record.maxMinutes)
-                    .filter(o => !record.minZone || o.zone >= record.minZone)
-                    .filter(o => !record.maxZone || o.zone <= record.maxZone);
+            const options = computeTargetRides(ftp, tss, record.minMinutes ?? 20, record.maxMinutes ?? 9999999)
+                .filter(o => !record.minZone || o.zone >= record.minZone)
+                .filter(o => !record.maxZone || o.zone <= record.maxZone);
 
-                if (options.length === 0) { tss = 0; }
-                record.rideOptions = options;
-            }
+            if (options.length === 0) { tss = 0; }
+            record.rideOptions = options;
 
             record.trainingLoad = tss;
-            fatigue = computeFatigue(fatigue, tss);
-            fitness = computeFitness(fitness, tss);
-            record.fatigue = fatigue;
-            record.fitness = fitness;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
         }
-        else {
-            fatigue = record.fatigue ?? computeFatigue(fatigue, 0);
-            fitness = record.fitness ?? computeFitness(fitness, 0);
+
+        if (record.trainingLoad !== undefined) {
+            fatigue = record.fatigue ?? computeFatigue(fatigue, record.trainingLoad);
+            fitness = record.fitness ?? computeFitness(fitness, record.trainingLoad);
         }
     }
 
