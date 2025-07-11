@@ -42,3 +42,20 @@ export function getToday() {
 export function addDays(date: Temporal.PlainDate, days: number) {
     return date.add(new Temporal.Duration(0, 0, 0, days));
 }
+
+
+export function lessThan(date1: Temporal.PlainDate, date2: Temporal.PlainDate) {
+    return date1.until(date2).days > 0;
+}
+
+export function moreThan(date1: Temporal.PlainDate, date2: Temporal.PlainDate) {
+    return date1.until(date2).days < 0;
+}
+
+export function lessThanEqual(date1: Temporal.PlainDate, date2: Temporal.PlainDate) {
+    return date1.until(date2).days >= 0;
+}
+
+export function moreThanEqual(date1: Temporal.PlainDate, date2: Temporal.PlainDate) {
+    return date1.until(date2).days <= 0;
+}

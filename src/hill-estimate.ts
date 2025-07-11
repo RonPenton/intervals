@@ -22,7 +22,7 @@ async function go() {
         curve,
         ftp,
         bikeWeightPounds + riderWeightPounds,
-        1.05
+        0.9
     );
     const time2 = `${Math.floor(secondsClimbing / 60)}:${String(Math.round(secondsClimbing % 60)).padStart(2, '0')}`;
     console.log(`Estimated climb time at ${power.toFixed(2)} W: ${time2}`);

@@ -1,3 +1,4 @@
+import { Temporal } from 'temporal-polyfill';
 import { type paths, type components } from './intervals-api-schema';
 
 
@@ -11,6 +12,7 @@ export type ICUWellness = Required<paths['/api/v1/athlete/{id}/wellness{ext}']['
 export type ICUPowerCurve = Required<components["schemas"]["DataCurve"]>;
 
 export async function getRides(
+    oldest: Temporal.PlainDate,
     athleteId = '0'
 ) {
     const path = '/api/v1/athlete/{id}/activities';
@@ -18,9 +20,8 @@ export async function getRides(
     type Get = paths[typeof path]['get'];
     type Query = Get['parameters']['query'];
 
-    const weeksToGet = 3;
     const query: Query = {
-        oldest: new Date(new Date().getTime() - weeksToGet * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        oldest: oldest.toString()
     }
 
 
@@ -127,13 +128,13 @@ export async function getPowerCurve(
 
     const data = await response.json() as resp;
 
-    if(data.list === undefined) {
+    if (data.list === undefined) {
         throw new Error('Power curve data is not in expected format');
     }
-    if(data.list.length === 0) {
+    if (data.list.length === 0) {
         throw new Error('No power curve data found');
     }
-    if(!data.list[0]) {
+    if (!data.list[0]) {
         throw new Error('Power curve data is empty');
     }
 

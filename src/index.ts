@@ -2,32 +2,48 @@ import 'dotenv-json2/config';
 import fs from 'fs';
 import { getRides, getWellness } from './intervals-api';
 import { pruneActivityFields, pruneWellnessFields } from './intervals-transformers';
-import { addDays, getMonday, getToday } from './days';
+import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
-import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, setSchedule } from './schedule';
-import { computeTrainingLoadRanges, targetCategories } from './training';
+import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
+import { computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories } from './training';
 
-export const bullet = (text: string) => `- ${text}`;
+const willRideToday = true;
+const daysToAdd = 10;
+const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
+
+function setSchedules(schedules: ScheduleRecord[]) {
+    setSchedule(schedules, { date: '2025-07-10', targetForm: 'D+1' });      // Thursday
+    setSchedule(schedules, { date: '2025-07-11', targetForm: -20 });      // Friday
+    setSchedule(schedules, { date: '2025-07-12', targetTrainingLoad: 10 }); // Saturday
+    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });    // Sunday
+    setSchedule(schedules, { date: '2025-07-14', targetForm: -10 });        // Monday   
+    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });        // Tuesday
+    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });        // Wednesday
+    setSchedule(schedules, { date: '2025-07-17', targetForm: -13 });        // Thursday
+    setSchedule(schedules, { date: '2025-07-18', targetForm: -8 });         // Friday
+    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });// Saturday    
+    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });    // Sunday
+}
 
 async function go() {
+
     console.log('Fetching rides from Intervals.icu...');
-    const rides = await getRides();
-    const transformed = rides.map(pruneActivityFields);
+    const rawRides = await getRides(seasonStart);
+    const rides = rawRides.map(pruneActivityFields);
 
     const outputFile = './activities.json';
-    const activities = JSON.stringify(transformed);
+    const activities = JSON.stringify(rides);
     fs.writeFileSync(outputFile, activities);
 
     const wellness = (await getWellness()).map(pruneWellnessFields);;
     const wellnessFile = './wellness.json';
     fs.writeFileSync(wellnessFile, JSON.stringify(wellness));
 
-    const willRideToday = true;
-    const daysToAdd = 10;
+    const peak = getPeakSevenDayTSS(seasonStart, rides);
 
     const today = getToday();
     const tomorrow = addDays(today, 1);
-    const rideToday = transformed.find(x => x.date === today.toString());
+    const rideToday = rides.find(x => x.date === today.toString());
 
     const startDT = (rideToday || !willRideToday) ? tomorrow : today;
     const endDT = addDays(startDT, daysToAdd);
@@ -44,7 +60,7 @@ async function go() {
     });
 
     const schedules = computeScheduleFromRides(
-        transformed,
+        rides,
         wellness,
         startDT,
         today,
@@ -53,24 +69,14 @@ async function go() {
         daysToAdd
     );
 
-    setSchedule(schedules, { date: '2025-07-10', targetForm: 'D+1' });      // Thursday
-    setSchedule(schedules, { date: '2025-07-11', targetForm: 'D+2' });      // Friday
-    setSchedule(schedules, { date: '2025-07-12', targetTrainingLoad: 10 }); // Saturday
-    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });    // Sunday
-    setSchedule(schedules, { date: '2025-07-14', targetForm: -10 });        // Monday   
-    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });        // Tuesday
-    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });        // Wednesday
-    setSchedule(schedules, { date: '2025-07-17', targetForm: -13 });        // Thursday
-    setSchedule(schedules, { date: '2025-07-18', targetForm: -8 });         // Friday
-    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });// Saturday    
-    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });    // Sunday
+    setSchedules(schedules);
 
-    computeTrainingLoads(schedules, transformed[0].currentFtp);
+    computeTrainingLoads(schedules, rides[0].currentFtp);
 
     console.log(`Schedule from ${startDate} to ${endDate} (today: ${today.toString()})`);
     schedules.forEach(record => {
         const parts = [
-            `${getDayOfWeek(record.date)}, ${record.date}`, ,
+            `${getDayOfWeek(record.date)}, ${record.date}`,
             `CTL: ${record.fitness?.toFixed(0)}`,
             `ATL: ${record.fatigue?.toFixed(0)}`,
             `Form: ${typeof record.form === 'number' ? record.form.toFixed(0) : 'N/A'}`,
@@ -175,3 +181,5 @@ void go();
 // - prefer z2 rides after rest days?
 // - z3+ rides after z2 days?
 // - taper back to z2 rides after z3+ rides
+
+export const bullet = (text: string) => `- ${text}`;

@@ -1,4 +1,6 @@
+import { Temporal } from "temporal-polyfill";
 import { Activity } from "./intervals-transformers";
+import { addDays, getToday, lessThan, moreThanEqual } from "./days";
 
 export function computeFitness(
     fitnessYesterday: number,
@@ -261,4 +263,47 @@ export function powerAtDurationFromPowerCurve(
         return p1;
     }
     return p2;
+}
+
+export function getPeakSevenDayTSS(
+    seasonStart: Temporal.PlainDate,
+    rides: Activity[]
+): number {
+
+    let day = seasonStart;
+
+    const scan = (day: Temporal.PlainDate) => {
+        const r: Activity[] = [];
+        const plusSeven = addDays(day, 7);
+        for (let index = 0; index < rides.length; index++) {
+            const ride = rides[index];
+            const date = Temporal.PlainDate.from(ride.date);
+            if (moreThanEqual(date, day) && lessThan(date, plusSeven)) {
+                r.push(ride);
+            }
+        }
+        return r;
+    }
+
+    const today = getToday();
+
+    let peakTSS = 0;
+    let from: Temporal.PlainDate = seasonStart;
+
+    while (lessThan(day, today)) {
+        const currentRides = scan(day);
+        const tss = currentRides.reduce((sum, ride) => sum + ride.trainingLoad, 0);
+
+        if (tss > peakTSS) {
+            peakTSS = tss;
+            from = day;
+
+            console.log(currentRides.map(x => `${x.date} ${x.trainingLoad} TSS`).join(', '));
+        }
+
+        day = addDays(day, 1);
+    }
+
+    console.log(`Peak 7-day TSS: ${peakTSS} from ${from.toString()} to ${addDays(from, 6).toString()}`);
+    return peakTSS;
 }
