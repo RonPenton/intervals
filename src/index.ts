@@ -1,28 +1,32 @@
 import 'dotenv-json2/config';
 import fs from 'fs';
 import { getRides, getWellness } from './intervals-api';
-import { pruneActivityFields, pruneWellnessFields } from './intervals-transformers';
+import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-transformers';
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
-import { computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories } from './training';
+import { computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories } from './training';
 
 const willRideToday = true;
 const daysToAdd = 10;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-10', targetForm: 'D+1' });      // Thursday
-    setSchedule(schedules, { date: '2025-07-11', targetForm: -20 });      // Friday
-    setSchedule(schedules, { date: '2025-07-12', targetTrainingLoad: 10 }); // Saturday
-    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });    // Sunday
-    setSchedule(schedules, { date: '2025-07-14', targetForm: -10 });        // Monday   
-    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });        // Tuesday
-    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });        // Wednesday
-    setSchedule(schedules, { date: '2025-07-17', targetForm: -13 });        // Thursday
-    setSchedule(schedules, { date: '2025-07-18', targetForm: -8 });         // Friday
-    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });// Saturday    
-    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });    // Sunday
+    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });        // Sunday
+    setSchedule(schedules, { date: '2025-07-14', targetForm: -13 });            // Monday   
+    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });            // Tuesday
+    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });          // Wednesday
+    setSchedule(schedules, { date: '2025-07-17', targetForm: 'decay' });          // Thursday
+    setSchedule(schedules, { date: '2025-07-18', targetForm: 0 });        // Friday
+    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });    // Saturday    
+    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });        // Sunday
+    setSchedule(schedules, { date: '2025-07-21', targetForm: -13 });            // Monday
+    setSchedule(schedules, { date: '2025-07-22', targetForm: -15 });            // Tuesday
+    setSchedule(schedules, { date: '2025-07-23', targetForm: 'D+1' });          // Wednesday
+    setSchedule(schedules, { date: '2025-07-24', targetForm: 'D+1' });          // Thursday
+    setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday
+    setSchedule(schedules, { date: '2025-07-26', targetTrainingLoad: 200 });    // Saturday
+    setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday
 }
 
 async function go() {
@@ -30,6 +34,8 @@ async function go() {
     console.log('Fetching rides from Intervals.icu...');
     const rawRides = await getRides(seasonStart);
     const rides = rawRides.map(pruneActivityFields);
+
+    fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
 
     const outputFile = './activities.json';
     const activities = JSON.stringify(rides);
@@ -48,16 +54,25 @@ async function go() {
     const startDT = (rideToday || !willRideToday) ? tomorrow : today;
     const endDT = addDays(startDT, daysToAdd);
 
+    const weekAgo = addDays(startDT, -7);
+    const filterLastWeek = (ride: Activity) => ride.date >= weekAgo.toString() && ride.date < startDT.toString();
+    const lastWeekRides = rides.filter(filterLastWeek);
+    const lastWeekTSS = lastWeekRides.reduce((sum, ride) => sum + ride.trainingLoad, 0);
+    console.log(`Last week TSS: ${lastWeekTSS} (from ${weekAgo.toString()} to ${startDT.toString()})`);
+
+    const percentOfPeak = (lastWeekTSS / peak) * 100;
+    console.log(`Last week TSS was ${lastWeekTSS} (${percentOfPeak.toFixed(1)}% of peak 7-day TSS)`);
+
     const startDate = startDT.toString();
     const endDate = endDT.toString();
 
     // console.log(`Start date: ${startDate}, End date: ${endDate}, Days to add: ${daysToAdd}, Monday: ${getMonday(today)}`);
 
-    const trainingRanges = computeTrainingLoadRanges(targetCategories, 500);
-    console.log('Training load ranges:');
-    Object.entries(trainingRanges).forEach(([name, range]) => {
-        console.log(`- ${name}: ${range[0].toFixed(1)} - ${range[1].toFixed(1)} TSS`);
-    });
+    // const trainingRanges = computeTrainingLoadRanges(targetCategories, 500);
+    // console.log('Training load ranges:');
+    // Object.entries(trainingRanges).forEach(([name, range]) => {
+    //     console.log(`- ${name}: ${range[0].toFixed(1)} - ${range[1].toFixed(1)} TSS`);
+    // });
 
     const schedules = computeScheduleFromRides(
         rides,
@@ -80,7 +95,7 @@ async function go() {
             `CTL: ${record.fitness?.toFixed(0)}`,
             `ATL: ${record.fatigue?.toFixed(0)}`,
             `Form: ${typeof record.form === 'number' ? record.form.toFixed(0) : 'N/A'}`,
-            !record.needsRide ? `TSS: ${record.trainingLoad}` : `Target TSS: ${record.trainingLoad}`,
+            !record.needsRide ? `TSS: ${record.trainingLoad}` : `Target TSS: ${record.trainingLoad} (${((record.trainingLoad ?? 0) * 1.05).toFixed(1)} Garmin)`,
             record.zone ? `Zone: ${record.zone}` : null
         ].filter(x => x !== null).join(', ');
 

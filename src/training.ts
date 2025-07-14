@@ -16,6 +16,8 @@ export function computeFatigue(
     return fatigueYesterday + (trainingLoad - fatigueYesterday) / 7;
 }
 
+
+
 export function computeRequiredTrainingLoad(
     fitnessYesterday: number,
     fatigueYesterday: number,
@@ -25,6 +27,17 @@ export function computeRequiredTrainingLoad(
     const b = (41 * fitnessYesterday) / 5;
     const c = (-36 * fatigueYesterday) / 5;
     return (a + b + c);
+}
+
+export function computeRequiredTrainingLoadForNextMorningForm(
+    fitnessYesterday: number,
+    fatigueYesterday: number,
+    nextMorningForm: number
+) {
+    const a = (-252 * nextMorningForm) / 25;
+    const b = (1681 * fitnessYesterday) / 175;
+    const c = (-1296 * fatigueYesterday) / 175;
+    return (a + b + c); 
 }
 
 export function computeTrainingLoadForRide(
@@ -297,8 +310,6 @@ export function getPeakSevenDayTSS(
         if (tss > peakTSS) {
             peakTSS = tss;
             from = day;
-
-            console.log(currentRides.map(x => `${x.date} ${x.trainingLoad} TSS`).join(', '));
         }
 
         day = addDays(day, 1);
