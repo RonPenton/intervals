@@ -5,28 +5,26 @@ import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
-import { computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories } from './training';
+import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories, zonesToStrings } from './training';
 
 const willRideToday = true;
 const daysToAdd = 10;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-13', targetForm: 'decay' });        // Sunday
-    setSchedule(schedules, { date: '2025-07-14', targetForm: -13 });            // Monday   
-    setSchedule(schedules, { date: '2025-07-15', targetForm: -13 });            // Tuesday
-    setSchedule(schedules, { date: '2025-07-16', targetForm: -13 });          // Wednesday
-    setSchedule(schedules, { date: '2025-07-17', targetForm: 'decay' });          // Thursday
-    setSchedule(schedules, { date: '2025-07-18', targetForm: 0 });        // Friday
-    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });    // Saturday    
+    setSchedule(schedules, { date: '2025-07-16', targetForm: -14 });            // Wednesday
+    setSchedule(schedules, { date: '2025-07-17', targetForm: 'decay' });        // Thursday
+    setSchedule(schedules, { date: '2025-07-18', targetTrainingLoad: 20 });     // Friday
+    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });    // Saturday    // Binghamton Ride
     setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });        // Sunday
     setSchedule(schedules, { date: '2025-07-21', targetForm: -13 });            // Monday
     setSchedule(schedules, { date: '2025-07-22', targetForm: -15 });            // Tuesday
-    setSchedule(schedules, { date: '2025-07-23', targetForm: 'D+1' });          // Wednesday
-    setSchedule(schedules, { date: '2025-07-24', targetForm: 'D+1' });          // Thursday
-    setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday
-    setSchedule(schedules, { date: '2025-07-26', targetTrainingLoad: 200 });    // Saturday
-    setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday
+    setSchedule(schedules, { date: '2025-07-23', targetTrainingLoad: 20 });     // Wednesday
+    setSchedule(schedules, { date: '2025-07-24', targetTrainingLoad: 200 });    // Thursday     // FTP Test
+    setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday       // In Ithaca
+    setSchedule(schedules, { date: '2025-07-26', targetForm: 'decay' });        // Saturday     // In Ithaca
+    setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday       // In Ithaca
+    setSchedule(schedules, { date: '2025-07-28', targetForm: -14 });            // Monday
 }
 
 async function go() {
@@ -45,8 +43,6 @@ async function go() {
     const wellnessFile = './wellness.json';
     fs.writeFileSync(wellnessFile, JSON.stringify(wellness));
 
-    const peak = getPeakSevenDayTSS(seasonStart, rides);
-
     const today = getToday();
     const tomorrow = addDays(today, 1);
     const rideToday = rides.find(x => x.date === today.toString());
@@ -54,17 +50,15 @@ async function go() {
     const startDT = (rideToday || !willRideToday) ? tomorrow : today;
     const endDT = addDays(startDT, daysToAdd);
 
-    const weekAgo = addDays(startDT, -7);
-    const filterLastWeek = (ride: Activity) => ride.date >= weekAgo.toString() && ride.date < startDT.toString();
-    const lastWeekRides = rides.filter(filterLastWeek);
-    const lastWeekTSS = lastWeekRides.reduce((sum, ride) => sum + ride.trainingLoad, 0);
-    console.log(`Last week TSS: ${lastWeekTSS} (from ${weekAgo.toString()} to ${startDT.toString()})`);
-
-    const percentOfPeak = (lastWeekTSS / peak) * 100;
-    console.log(`Last week TSS was ${lastWeekTSS} (${percentOfPeak.toFixed(1)}% of peak 7-day TSS)`);
-
     const startDate = startDT.toString();
     const endDate = endDT.toString();
+
+    const powerZones = calculateCogganPowerZones(rides[0].currentFtp);
+    const zoneStrs = zonesToStrings(powerZones);
+    console.log('------------------------------------------------------------------------');
+    console.log('Power Zones:');
+    Object.entries(zoneStrs).forEach(([name, range]) => console.log(`- ${name}: ${range}`));
+    console.log('------------------------------------------------------------------------');
 
     // console.log(`Start date: ${startDate}, End date: ${endDate}, Days to add: ${daysToAdd}, Monday: ${getMonday(today)}`);
 
@@ -88,7 +82,8 @@ async function go() {
 
     computeTrainingLoads(schedules, rides[0].currentFtp);
 
-    console.log(`Schedule from ${startDate} to ${endDate} (today: ${today.toString()})`);
+    console.log('Past Week:');
+
     schedules.forEach(record => {
         const parts = [
             `${getDayOfWeek(record.date)}, ${record.date}`,
@@ -100,7 +95,8 @@ async function go() {
         ].filter(x => x !== null).join(', ');
 
         if (record.date == startDT.toString()) {
-            console.log('=================================================================');
+            console.log('------------------------------------------------------------------------');
+            console.log(`Ride options for ${startDate} to ${endDate} (today: ${today.toString()}):`);
         }
 
         console.log(`- ${parts}`);
@@ -112,6 +108,30 @@ async function go() {
             console.log(`   - ${opts}`);
         }
     });
+
+
+    console.log('------------------------------------------------------------------------');
+
+    const { peakTSS, peakFrom, peakTo } = getPeakSevenDayTSS(seasonStart, rides);
+    console.log(`Peak 7-day TSS: ${peakTSS} from ${peakFrom.toString()} to ${peakTo.toString()}`);
+
+    const weekAgo = addDays(startDT, -7);
+    const weekAhead = addDays(startDT, 7);
+    const filterLastWeek = (ride: Activity) => ride.date >= weekAgo.toString() && ride.date < startDT.toString();
+    const filterNextWeek = (schedule: ScheduleRecord) => schedule.date >= startDT.toString() && schedule.date < weekAhead.toString();
+
+    const lastWeekRides = rides.filter(filterLastWeek);
+    const lastWeekTSS = lastWeekRides.reduce((sum, ride) => sum + ride.trainingLoad, 0);
+    const percentOfPeak = (lastWeekTSS / peakTSS) * 100;
+    console.log(`Last week TSS: ${lastWeekTSS} (${percentOfPeak.toFixed(1)}% of peak 7-day TSS)`);
+
+    const nextWeekSchedules = schedules.filter(filterNextWeek);
+    const nextWeekTSS = nextWeekSchedules.reduce((sum, schedule) => sum + (schedule.trainingLoad ?? 0), 0);
+    const nextWeekPercent = (nextWeekTSS / peakTSS) * 100;
+    console.log(`Next week TSS: ${nextWeekTSS} (${nextWeekPercent.toFixed(1)}% of peak 7-day TSS)`);
+    console.log('------------------------------------------------------------------------');
+
+
 
     // const pastDays = getPastDays(today, startDT);
     // const ftp = transformed[0].currentFtp;

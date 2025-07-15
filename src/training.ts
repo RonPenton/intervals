@@ -37,7 +37,7 @@ export function computeRequiredTrainingLoadForNextMorningForm(
     const a = (-252 * nextMorningForm) / 25;
     const b = (1681 * fitnessYesterday) / 175;
     const c = (-1296 * fatigueYesterday) / 175;
-    return (a + b + c); 
+    return (a + b + c);
 }
 
 export function computeTrainingLoadForRide(
@@ -60,16 +60,31 @@ export function computeTrainingLoad(
 }
 
 export const calculateCogganPowerZones = (ftp: number) => {
-    return {
-        zone_1_active_recovery: [0, 0.55 * ftp],
-        zone_2_endurance: [0.55 * ftp, 0.75 * ftp],
-        zone_3_tempo: [0.75 * ftp, 0.90 * ftp],
-        zone_4_lactate_threshold: [0.90 * ftp, 1.05 * ftp],
-        zone_5_vo2_max: [1.05 * ftp, 1.20 * ftp],
-        zone_6_anaerobic_capacity: [1.20 * ftp, 1.50 * ftp],
-        zone_7_neuromuscular_power: [1.50 * ftp, Infinity]
-    } as const;
+    return Object.fromEntries(
+        CogganPowerZones.map(zone => [zone.name, [ftp * zone.minPowerPct / 100, ftp * zone.maxPowerPct / 100]] as const)
+    );
 }
+
+export type PowerZone = {
+    name: string;
+    value: number;
+    minPowerPct: number;
+    maxPowerPct: number;
+    minContinuousMinutes?: number;
+    maxContinuousMinutes?: number;
+    minIntervalMinutes?: number;
+    maxIntervalMinutes?: number;
+}
+
+export const CogganPowerZones: PowerZone[] = [
+    { name: "Active Recovery", value: 1, minPowerPct: 0, maxPowerPct: 55, minContinuousMinutes: 30, maxContinuousMinutes: 90 },
+    { name: "Endurance", value: 2, minPowerPct: 55, maxPowerPct: 75, minContinuousMinutes: 60, maxContinuousMinutes: 300 },
+    { name: "Tempo", value: 3, minPowerPct: 75, maxPowerPct: 90, minContinuousMinutes: 60, maxContinuousMinutes: 180 },
+    { name: "Lactate Threshold", value: 4, minPowerPct: 90, maxPowerPct: 105, minIntervalMinutes: 8, maxIntervalMinutes: 30 },
+    { name: "VO2 Max", value: 5, minPowerPct: 105, maxPowerPct: 120, minIntervalMinutes: 3, maxIntervalMinutes: 8 },
+    { name: "Anaerobic Capacity", value: 6, minPowerPct: 120, maxPowerPct: 150, minIntervalMinutes: 0.5, maxIntervalMinutes: 3 },
+    { name: "Neuromuscular Power", value: 7, minPowerPct: 150, maxPowerPct: Infinity, minIntervalMinutes: 0.1, maxIntervalMinutes: 0.5 }
+];
 
 export type TargetCategory = {
     name: string;
@@ -281,7 +296,7 @@ export function powerAtDurationFromPowerCurve(
 export function getPeakSevenDayTSS(
     seasonStart: Temporal.PlainDate,
     rides: Activity[]
-): number {
+) {
 
     let day = seasonStart;
 
@@ -315,6 +330,5 @@ export function getPeakSevenDayTSS(
         day = addDays(day, 1);
     }
 
-    console.log(`Peak 7-day TSS: ${peakTSS} from ${from.toString()} to ${addDays(from, 6).toString()}`);
-    return peakTSS;
+    return { peakTSS, peakFrom: from, peakTo: addDays(from, 6) };
 }
