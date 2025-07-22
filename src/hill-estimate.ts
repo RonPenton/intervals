@@ -6,8 +6,8 @@ const bikeWeightPounds = 20;
 const riderWeightPounds = 400;
 
 
-const hillMiles = 6.6;
-const elevationFeet = 615;
+const hillMiles = 3.47;
+const elevationFeet = 550;
 const speedMph = 5.3;
 const ftp = 212;
 //const power = 168;
@@ -22,7 +22,7 @@ async function go() {
         curve,
         ftp,
         bikeWeightPounds + riderWeightPounds,
-        1
+        0.95
     );
     const time2 = `${Math.floor(secondsClimbing / 60)}:${String(Math.round(secondsClimbing % 60)).padStart(2, '0')}`;
     console.log(`Estimated climb time at ${power.toFixed(2)} W: ${time2}`);

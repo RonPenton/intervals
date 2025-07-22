@@ -5,26 +5,31 @@ import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
-import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, targetCategories, zonesToStrings } from './training';
+import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, IntervalRange, targetCategories, zonesToStrings } from './training';
 
 const willRideToday = true;
 const daysToAdd = 10;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 
+
+const intervalRanges: IntervalRange[] = [
+    { zone: 3.5, minReps: 2, maxReps: 4, minMinutes: 10, maxMinutes: 20, restMinutes: 15 },  // sweet spot
+    { zone: 4, minReps: 2, maxReps: 4, minMinutes: 10, maxMinutes: 20, restMinutes: 10 },   // threshold
+    { zone: 5, minReps: 3, maxReps: 6, minMinutes: 1, maxMinutes: 3, restMinutes: 5 },    // VO2 max
+]
+
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-16', targetForm: -14 });            // Wednesday
-    setSchedule(schedules, { date: '2025-07-17', targetForm: 'decay' });        // Thursday
-    setSchedule(schedules, { date: '2025-07-18', targetTrainingLoad: 20 });     // Friday
-    setSchedule(schedules, { date: '2025-07-19', targetTrainingLoad: 200 });    // Saturday    // Binghamton Ride
-    setSchedule(schedules, { date: '2025-07-20', targetForm: 'decay' });        // Sunday
-    setSchedule(schedules, { date: '2025-07-21', targetForm: -13 });            // Monday
-    setSchedule(schedules, { date: '2025-07-22', targetForm: -15 });            // Tuesday
-    setSchedule(schedules, { date: '2025-07-23', targetTrainingLoad: 20 });     // Wednesday
-    setSchedule(schedules, { date: '2025-07-24', targetTrainingLoad: 200 });    // Thursday     // FTP Test
+    setSchedule(schedules, { date: '2025-07-22', targetForm: -11 });            // Tuesday
+    setSchedule(schedules, { date: '2025-07-23', targetTrainingLoad: 200 });    // Wednesday    // FTP Test
+    setSchedule(schedules, { date: '2025-07-24', targetForm: -25 });            // Thursday     
     setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday       // In Ithaca
     setSchedule(schedules, { date: '2025-07-26', targetForm: 'decay' });        // Saturday     // In Ithaca
     setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday       // In Ithaca
-    setSchedule(schedules, { date: '2025-07-28', targetForm: -14 });            // Monday
+    setSchedule(schedules, { date: '2025-07-28', targetForm: 0 });              // Monday
+    setSchedule(schedules, { date: '2025-07-29', targetForm: -4 });             // Tuesday
+    setSchedule(schedules, { date: '2025-07-30', targetForm: 'maintain' });     // Wednesday
+    setSchedule(schedules, { date: '2025-07-31', targetForm: -7 });             // Thursday
+    setSchedule(schedules, { date: '2025-08-01', targetForm: 'maintain' });     // Friday
 }
 
 async function go() {
@@ -90,6 +95,7 @@ async function go() {
             `CTL: ${record.fitness?.toFixed(0)}`,
             `ATL: ${record.fatigue?.toFixed(0)}`,
             `Form: ${typeof record.form === 'number' ? record.form.toFixed(0) : 'N/A'}`,
+            `Form%: ${typeof record.form === 'number' ? Math.round((record.form / (record.fitness ?? 1)) * 100) : 'N/A'}`,
             !record.needsRide ? `TSS: ${record.trainingLoad}` : `Target TSS: ${record.trainingLoad} (${((record.trainingLoad ?? 0) * 1.05).toFixed(1)} Garmin)`,
             record.zone ? `Zone: ${record.zone}` : null
         ].filter(x => x !== null).join(', ');

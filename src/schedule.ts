@@ -2,7 +2,7 @@ import { keysOf } from "tsc-utils";
 import { Activity, Wellness } from "./intervals-transformers";
 import { Temporal } from "temporal-polyfill";
 import { days } from "./days";
-import { computeFatigue, computeFitness, computeRequiredTrainingLoad, computeTargetRides, TargetRide } from "./training";
+import { computeFatigue, computeFitness, computeRequiredTrainingLoad, computeRequiredTrainingLoadFromFormPercentage, computeTargetRides, TargetRide } from "./training";
 
 export type ScheduleId = {
     offset: number;
@@ -23,6 +23,7 @@ export type ScheduleFields = {
     trainingLoad?: number;
 
     targetForm?: number | 'decay' | 'maintain' | Delta;
+    targetFormPercent?: number | Delta;
     targetTrainingLoad?: number;
     minMinutes?: number;
     maxMinutes?: number;
@@ -136,6 +137,22 @@ export function computeTrainingLoads(
             record.trainingLoad = record.targetTrainingLoad;
             record.fatigue = computeFatigue(fatigue, record.trainingLoad);
             record.fitness = computeFitness(fitness, record.trainingLoad);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.trainingLoad === undefined && record.targetFormPercent !== undefined) {
+            let targetFormPercent = record.targetFormPercent;
+            if (typeof targetFormPercent === 'string') {
+                const formY = schedules[i - 1].form ?? 0;
+                const fitY = schedules[i - 1].fitness ?? 0;
+                const percentY = (formY / fitY);
+                const val = Number(targetFormPercent.substring(1));
+                targetFormPercent = (percentY + val);
+            }
+
+            const tss = Math.round(computeRequiredTrainingLoadFromFormPercentage(fitness, fatigue, targetFormPercent));
+            record.trainingLoad = tss;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
             record.form = record.fitness - record.fatigue;
         }
         else if (record.form === undefined && record.targetForm !== undefined) {

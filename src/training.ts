@@ -29,6 +29,23 @@ export function computeRequiredTrainingLoad(
     return (a + b + c);
 }
 
+/**
+ * @param fitnessYesterday 
+ * @param fatigueYesterday 
+ * @param targetFormPercent 
+ * @returns 
+ */
+export function computeRequiredTrainingLoadFromFormPercentage(
+    fitnessYesterday: number,
+    fatigueYesterday: number,
+    targetFormPercent: number
+) {
+    const a = -252 * fatigueYesterday;
+    const b = -287 * fitnessYesterday * (targetFormPercent - 1);
+    const c = (7 * targetFormPercent) + 35;
+    return (a + b) / c;
+}
+
 export function computeRequiredTrainingLoadForNextMorningForm(
     fitnessYesterday: number,
     fatigueYesterday: number,
@@ -90,8 +107,9 @@ export type TargetCategory = {
     name: string;
     zone: number;
     percentFtp: number;
-    minMinutes?: number,
-    maxMinutes?: number
+    minMinutes?: number;
+    maxMinutes?: number;
+    continuousZone?: number;
 }
 
 export type TargetRide = TargetCategory & {
@@ -99,16 +117,25 @@ export type TargetRide = TargetCategory & {
     power: number;
 }
 
+export type IntervalRange = {
+    zone: number;
+    minReps: number;
+    maxReps: number;
+    minMinutes: number;
+    maxMinutes: number;
+    restMinutes: number;
+}
+
 export const targetCategories = [
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 20, maxMinutes: 60 },
     { name: "Base", zone: 2, percentFtp: 60, minMinutes: 35, maxMinutes: 100 },
     { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutes: 120 },
-    { name: "Endurance Base", zone: 2.5, percentFtp: 74, minMinutes: 40, maxMinutes: 120 },
+    { name: "Endurance Base", zone: 2.6, percentFtp: 74, minMinutes: 40, maxMinutes: 120 },
     { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 150 },
-    { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 120 },
-    { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 60 },
-    { name: "VO2 Max", zone: 5, percentFtp: 110, minMinutes: 15, maxMinutes: 60 },
-] as const;
+    { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 45, continuousZone: 2 },
+    { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 45, continuousZone: 2 },
+    { name: "VO2 Max", zone: 5, percentFtp: 110, minMinutes: 15, maxMinutes: 30, continuousZone: 2 },
+] as const satisfies TargetCategory[];
 
 
 export function computeTrainingLoadRanges(
