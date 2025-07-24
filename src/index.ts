@@ -19,17 +19,17 @@ const intervalRanges: IntervalRange[] = [
 ]
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-22', targetForm: -11 });            // Tuesday
-    setSchedule(schedules, { date: '2025-07-23', targetTrainingLoad: 200 });    // Wednesday    // FTP Test
-    setSchedule(schedules, { date: '2025-07-24', targetForm: -25 });            // Thursday     
+    setSchedule(schedules, { date: '2025-07-24', targetFormPercent: -40 });            // Thursday     
     setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday       // In Ithaca
     setSchedule(schedules, { date: '2025-07-26', targetForm: 'decay' });        // Saturday     // In Ithaca
     setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday       // In Ithaca
     setSchedule(schedules, { date: '2025-07-28', targetForm: 0 });              // Monday
-    setSchedule(schedules, { date: '2025-07-29', targetForm: -4 });             // Tuesday
-    setSchedule(schedules, { date: '2025-07-30', targetForm: 'maintain' });     // Wednesday
-    setSchedule(schedules, { date: '2025-07-31', targetForm: -7 });             // Thursday
+    setSchedule(schedules, { date: '2025-07-29', targetFormPercent: -10 });     // Tuesday
+    setSchedule(schedules, { date: '2025-07-30', targetForm: 'D-1' });          // Wednesday
+    setSchedule(schedules, { date: '2025-07-31', targetForm: 'D-1' });          // Thursday
     setSchedule(schedules, { date: '2025-08-01', targetForm: 'maintain' });     // Friday
+    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 200 });    // Saturday Long ride?
+    setSchedule(schedules, { date: '2025-08-03', targetForm: 'maintain' });     // Sunday
 }
 
 async function go() {

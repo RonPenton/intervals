@@ -149,6 +149,8 @@ export function computeTrainingLoads(
                 targetFormPercent = (percentY + val);
             }
 
+            targetFormPercent = targetFormPercent / 100;
+
             const tss = Math.round(computeRequiredTrainingLoadFromFormPercentage(fitness, fatigue, targetFormPercent));
             record.trainingLoad = tss;
             record.fatigue = computeFatigue(fatigue, tss);
