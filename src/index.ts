@@ -19,17 +19,16 @@ const intervalRanges: IntervalRange[] = [
 ]
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-24', targetFormPercent: -40 });            // Thursday     
-    setSchedule(schedules, { date: '2025-07-25', targetForm: 'decay' });        // Friday       // In Ithaca
-    setSchedule(schedules, { date: '2025-07-26', targetForm: 'decay' });        // Saturday     // In Ithaca
-    setSchedule(schedules, { date: '2025-07-27', targetForm: 'decay' });        // Sunday       // In Ithaca
-    setSchedule(schedules, { date: '2025-07-28', targetForm: 0 });              // Monday
-    setSchedule(schedules, { date: '2025-07-29', targetFormPercent: -10 });     // Tuesday
-    setSchedule(schedules, { date: '2025-07-30', targetForm: 'D-1' });          // Wednesday
-    setSchedule(schedules, { date: '2025-07-31', targetForm: 'D-1' });          // Thursday
-    setSchedule(schedules, { date: '2025-08-01', targetForm: 'maintain' });     // Friday
-    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 200 });    // Saturday Long ride?
-    setSchedule(schedules, { date: '2025-08-03', targetForm: 'maintain' });     // Sunday
+    setSchedule(schedules, { date: '2025-07-29', targetFormPercent: -12 });     // Tuesday
+    setSchedule(schedules, { date: '2025-07-30', targetTrainingLoad: 10 });     // Wednesday
+    setSchedule(schedules, { date: '2025-07-31', targetFormPercent: -12 });          // Thursday
+    setSchedule(schedules, { date: '2025-08-01', targetFormPercent: -10 });     // Friday
+    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 80 });     // Saturday
+    setSchedule(schedules, { date: '2025-08-03', targetTrainingLoad: 200 });    // Sunday
+    setSchedule(schedules, { date: '2025-08-04', targetForm: -15 });              // Monday
+    setSchedule(schedules, { date: '2025-08-05', targetForm: 'D-1' });          // Tuesday
+    setSchedule(schedules, { date: '2025-08-06', targetFormPercent: -30 });          // Wednesday
+    setSchedule(schedules, { date: '2025-08-07', targetForm: 'maintain' });          // Thursday
 }
 
 async function go() {
