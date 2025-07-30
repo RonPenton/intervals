@@ -87,28 +87,16 @@ export type PowerZone = {
     value: number;
     minPowerPct: number;
     maxPowerPct: number;
-    minContinuousMinutes?: number;
-    maxContinuousMinutes?: number;
-    minIntervalMinutes?: number;
-    maxIntervalMinutes?: number;
 }
-
-export const CogganPowerZones: PowerZone[] = [
-    { name: "Active Recovery", value: 1, minPowerPct: 0, maxPowerPct: 55, minContinuousMinutes: 30, maxContinuousMinutes: 90 },
-    { name: "Endurance", value: 2, minPowerPct: 55, maxPowerPct: 75, minContinuousMinutes: 60, maxContinuousMinutes: 300 },
-    { name: "Tempo", value: 3, minPowerPct: 75, maxPowerPct: 90, minContinuousMinutes: 60, maxContinuousMinutes: 180 },
-    { name: "Lactate Threshold", value: 4, minPowerPct: 90, maxPowerPct: 105, minIntervalMinutes: 8, maxIntervalMinutes: 30 },
-    { name: "VO2 Max", value: 5, minPowerPct: 105, maxPowerPct: 120, minIntervalMinutes: 3, maxIntervalMinutes: 8 },
-    { name: "Anaerobic Capacity", value: 6, minPowerPct: 120, maxPowerPct: 150, minIntervalMinutes: 0.5, maxIntervalMinutes: 3 },
-    { name: "Neuromuscular Power", value: 7, minPowerPct: 150, maxPowerPct: Infinity, minIntervalMinutes: 0.1, maxIntervalMinutes: 0.5 }
-];
 
 export type TargetCategory = {
     name: string;
     zone: number;
     percentFtp: number;
-    minMinutes?: number;
-    maxMinutes?: number;
+    minMinutesInZone?: number;
+    maxMinutesInZone?: number;
+    maxMinutesTotal?: number;
+    minIntervalRestMinutes?: number;
     continuousZone?: number;
 }
 
@@ -117,26 +105,76 @@ export type TargetRide = TargetCategory & {
     power: number;
 }
 
-export type IntervalRange = {
+export type IntervalLength = {
     zone: number;
-    minReps: number;
-    maxReps: number;
     minMinutes: number;
     maxMinutes: number;
-    restMinutes: number;
 }
 
+export type IntervalRange = IntervalLength & {
+    minReps: number;
+    maxReps: number;
+}
+
+// thoughts on how to create a schedule: 
+// 1. First figure out the target form/percentage/etc for each day.
+// 2. Then figure out the training load required to achieve that form.
+// 3. Then we need to figure out which ride options are available for that training load. 
+
+// Step 3 is complex because there are two types of rides:
+// - Continuous rides: These are rides that are done in one power zone with no intervals
+// - Interval rides: these are rides that contain intervals at a higher power zone, and then rest periods and 
+//                   potentially "bookends" to extend the ride in a Z1/2 state.
+
+// A continous ride is simple and simply has a target power, and a duration range. 
+// An interval ride will have:
+//  - A target power for the intervals
+//  - A target power for the rest/remaining periods. 
+//  - a min/max amount of total time in the interval power zone
+//  - a min/max amount of time for each interval
+//  - a min amount of time for each rest period
+
+export const CogganPowerZones: PowerZone[] = [
+    { name: "Active Recovery", value: 1, minPowerPct: 0, maxPowerPct: 55 },
+    { name: "Endurance", value: 2, minPowerPct: 55, maxPowerPct: 75 },
+    { name: "Tempo", value: 3, minPowerPct: 75, maxPowerPct: 90 },
+    { name: "Lactate Threshold", value: 4, minPowerPct: 90, maxPowerPct: 105 },
+    { name: "VO2 Max", value: 5, minPowerPct: 105, maxPowerPct: 120 },
+    { name: "Anaerobic Capacity", value: 6, minPowerPct: 120, maxPowerPct: 150 },
+    { name: "Neuromuscular Power", value: 7, minPowerPct: 150, maxPowerPct: Infinity }
+];
+
 export const targetCategories = [
-    { name: "Recovery", zone: 1, percentFtp: 50, minMinutes: 20, maxMinutes: 60 },
-    { name: "Base", zone: 2, percentFtp: 60, minMinutes: 35, maxMinutes: 100 },
-    { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutes: 120 },
-    { name: "Endurance Base", zone: 2.6, percentFtp: 74, minMinutes: 40, maxMinutes: 120 },
-    { name: "Tempo", zone: 3, percentFtp: 83, minMinutes: 45, maxMinutes: 150 },
-    { name: "Sweet Spot", zone: 3.5, percentFtp: 90, minMinutes: 45, maxMinutes: 45, continuousZone: 2 },
-    { name: "Threshold", zone: 4, percentFtp: 100, minMinutes: 20, maxMinutes: 45, continuousZone: 2 },
-    { name: "VO2 Max", zone: 5, percentFtp: 110, minMinutes: 15, maxMinutes: 30, continuousZone: 2 },
+    { name: "Recovery", zone: 1, percentFtp: 50, minMinutesInZone: 30, maxMinutesInZone: 90 },
+    { name: "Long Ride", zone: 2, percentFtp: 62, minMinutesInZone: 120 },
+    { name: "Endurance", zone: 2.5, percentFtp: 72, minMinutesInZone: 40, maxMinutesInZone: 120 },
+    { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 90 },
+    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 30, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
+    { name: "Sweet Spot", zone: 3.6, percentFtp: 90, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
+    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 45, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 4 },
+    { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 10, maxMinutesInZone: 24, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 3 },
 ] as const satisfies TargetCategory[];
 
+export const intervalLengths = [
+    { zone: 3.5, minMinutes: 20, maxMinutes: 90 },
+    { zone: 3.6, minMinutes: 10, maxMinutes: 60 },
+    { zone: 4, minMinutes: 8, maxMinutes: 30 },
+    { zone: 5, minMinutes: 3, maxMinutes: 8 }
+] as const satisfies IntervalLength[];
+
+export const intervalProgressions = [
+    { zone: 3.5, progressions: [[1, 20], [1, 30], [2, 20], [1, 45], [2, 30], [1, 60], [2, 45], [1, 90]] },
+    { zone: 3.6, progressions: [[1, 10], [1, 15], [2, 10], [1, 20], [2, 15], [1, 30], [2, 20], [3, 15], [2, 25], [1, 50], [4, 15], [3, 20], [2, 30], [1, 60]] },
+    { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [3, 15], [2, 25], [1, 45]] },
+    { zone: 5, progressions: [[1, 3], [1, 5], [2, 3], [1, 6], [2, 5], [1, 8], [3, 5], [2, 8], [3, 6], [4, 6], [3, 8]] }
+] as const satisfies IntervalProgression[];
+
+
+export type IntervalDefinition = [reps: number, minutes: number];
+export type IntervalProgression = {
+    zone: number;
+    progressions: IntervalDefinition[];
+}
 
 export function computeTrainingLoadRanges(
     targetCategories: readonly TargetCategory[],
@@ -145,12 +183,12 @@ export function computeTrainingLoadRanges(
     const ranges: { [key: string]: [number, number] } = {};
     for (const category of targetCategories) {
         let low = 0;
-        if (category.minMinutes !== undefined) {
-            low = computeTrainingLoad(category.minMinutes / 60, category.percentFtp / 100 * ftp, ftp);
+        if (category.minMinutesInZone !== undefined) {
+            low = computeTrainingLoad(category.minMinutesInZone / 60, category.percentFtp / 100 * ftp, ftp);
         }
         let high = Infinity;
-        if (category.maxMinutes !== undefined) {
-            high = computeTrainingLoad(category.maxMinutes / 60, category.percentFtp / 100 * ftp, ftp);
+        if (category.maxMinutesInZone !== undefined) {
+            high = computeTrainingLoad(category.maxMinutesInZone / 60, category.percentFtp / 100 * ftp, ftp);
         }
         ranges[category.name] = [low, high];
     }
@@ -183,10 +221,10 @@ function calculateHoursForTargetRide(
     const hours = ((trainingLoadTarget / 100) * ftp2) / np2;
 
     const minutes = Math.round(hours * 60);
-    if (category.minMinutes && minutes < category.minMinutes) {
+    if (category.minMinutesInZone && minutes < category.minMinutesInZone) {
         return null; // Not enough time for this ride
     }
-    if (category.maxMinutes && minutes > category.maxMinutes) {
+    if (category.maxMinutesInZone && minutes > category.maxMinutesInZone) {
         return null; // Too much time for this ride
     }
 

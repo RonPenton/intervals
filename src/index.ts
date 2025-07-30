@@ -21,7 +21,7 @@ const intervalRanges: IntervalRange[] = [
 function setSchedules(schedules: ScheduleRecord[]) {
     setSchedule(schedules, { date: '2025-07-29', targetFormPercent: -12 });     // Tuesday
     setSchedule(schedules, { date: '2025-07-30', targetTrainingLoad: 10 });     // Wednesday
-    setSchedule(schedules, { date: '2025-07-31', targetFormPercent: -12 });          // Thursday
+    setSchedule(schedules, { date: '2025-07-31', targetForm: -10 });          // Thursday
     setSchedule(schedules, { date: '2025-08-01', targetFormPercent: -10 });     // Friday
     setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 80 });     // Saturday
     setSchedule(schedules, { date: '2025-08-03', targetTrainingLoad: 200 });    // Sunday
@@ -136,78 +136,6 @@ async function go() {
     console.log(`Next week TSS: ${nextWeekTSS} (${nextWeekPercent.toFixed(1)}% of peak 7-day TSS)`);
     console.log('------------------------------------------------------------------------');
 
-
-
-    // const pastDays = getPastDays(today, startDT);
-    // const ftp = transformed[0].currentFtp;
-    // const zones = calculateCogganPowerZones(ftp);
-
-    // const pastActivities = pastDays.map(day => {
-    //     const activity = transformed.find(x => x.date === day);
-    //     if (!activity && day == today.toString()) { return [] }
-    //     if (!activity) {
-    //         return [`On ${day}, I will rest.`];
-    //     }
-    //     return [`On ${day}, I will ride ${activity.miles} miles, for ${activity.duration}, in ${getZoneForPower(activity.normalizedWatts, zones)}.`];
-    // }).flat();
-
-    // const restrictions = [
-    //     "7/7 will be a light recovery day.",
-    //     "The night of 7/11 I will have a late night and probably not sleep optimally.",
-    //     "7/10 looks like it might be a rainy day, so I may not ride.",
-    //     ...pastActivities
-    // ].map(bullet).join('\n');
-
-    // const notes = [
-    //     "I cannot ride more than 25 miles on weekdays.",
-    //     "In general, the day before a long ride should be light recovery or rest.",
-    //     // "Long rides, above 35 miles, should be in Zone 2."
-    // ].map(bullet).join('\n');
-
-    // const goals = [
-    //     //'I want to test my FTP sometime in the next 2 weeks.'
-    //     'I want to ride at least 100 miles this week.',
-    //     // 'I want to ride around 50 miles on Friday, July 4th, 2025.'
-    // ].map(bullet).join('\n');
-
-    // const food = [
-    //     'I have bars that have 250 calories each, 43g carbs, 17g sugar, 6g fat, 10g protein.',
-    //     'I have gels that have 200 calories each, 48g carbs, 25g sugar, 0g fat, 0g protein.',
-    //     'food items cannot be split into smaller portions and should be used whole',
-    //     'food should **NEVER** be consumed on rides shorter than 100 minutes',
-    //     'aim for around 225 calories per hour on rides greater than 100 minutes. Be sure not to exceed this amount.'
-    // ].map(bullet).join('\n');
-
-    // const prompt = loadPrompt('cycling', {
-    //     activities,
-    //     today,
-    //     restrictions,
-    //     notes,
-    //     goals,
-    //     ftp,
-    //     food,
-    //     startDate,
-    //     endDate,
-    //     ...zonesToStrings(zones)
-    // });
-
-
-
-    // console.log('Prompt to OpenAI:');
-    // console.log(prompt);
-
-    // const response = await sendGptMessage([
-    //     { role: 'system', content: 'You are a cycling coach.' },
-    //     { role: 'user', content: prompt }
-    // ]);
-
-    // if (!response) {
-    //     console.error('No response from OpenAI');
-    //     return;
-    // }
-
-    // console.log('Response from OpenAI:');
-    // console.log(response);
 }
 
 
