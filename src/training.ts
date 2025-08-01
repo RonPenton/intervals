@@ -76,6 +76,19 @@ export function computeTrainingLoad(
     return Math.round(tss * 10) / 10; // Round to one decimal place
 }
 
+export function computeMinutesForTrainingLoad(
+    percentFtp: number,
+    ftp: number,
+    trainingLoadTarget: number
+) {
+    const np = percentFtp / 100 * ftp;
+    const np2 = Math.pow(np, 2);
+    const ftp2 = Math.pow(ftp, 2);
+    const hours = ((trainingLoadTarget / 100) * ftp2) / np2;
+    return hours * 60;
+}
+
+
 export const calculateCogganPowerZones = (ftp: number) => {
     return Object.fromEntries(
         CogganPowerZones.map(zone => [zone.name, [ftp * zone.minPowerPct / 100, ftp * zone.maxPowerPct / 100]] as const)
@@ -100,21 +113,73 @@ export type TargetCategory = {
     continuousZone?: number;
 }
 
-export type TargetRide = TargetCategory & {
-    minutes: number;
-    power: number;
-}
-
-export type IntervalLength = {
+export type CurrentIntervalProgression = {
     zone: number;
-    minMinutes: number;
-    maxMinutes: number;
+    progression: IntervalDefinition;
+};
+
+export type CurrentIntervalProgressions = CurrentIntervalProgression[];
+export type IntervalDefinition = [reps: number, minutes: number];
+
+export type IntervalProgression = {
+    zone: number;
+    progressions: IntervalDefinition[];
 }
 
-export type IntervalRange = IntervalLength & {
-    minReps: number;
-    maxReps: number;
+export type TargetRideContinuous = {
+    name: string;
+    zone: number;
+    continuousZone: number;
+    continuousWatts: number;
+    totalMinutes: number;
 }
+
+export type TargetRideInterval = TargetRideContinuous & {
+    intervalZone: number;
+    intervalWatts: number;
+    intervalReps: number;
+    intervalMinutes: number;
+    restMinutes: number;            // not total rest minutes, just the rest between intervals.
+}
+
+export type TargetRide = TargetRideContinuous | TargetRideInterval;
+
+export function formatMinutes(minutes: number): string {
+    const pad2 = (num: number) => String(num).padStart(2, '0');
+    if (minutes > 60) {
+        const hours = Math.floor(minutes / 60);
+        const mins = Math.round(minutes % 60);
+        return `${hours}h${pad2(mins)}m`;
+    }
+    else if (minutes > 1) {
+        return `${Math.round(minutes)}m`;
+    }
+    else {
+        return `${Math.round(minutes * 60)}s`;
+    }
+}
+
+export function printTargetRide(ride: TargetRide) {
+    if ('intervalZone' in ride) {
+        const rest = ride.intervalReps > 1 ? ` (rest ${formatMinutes(ride.restMinutes)})` : '';
+        const continuousMinutes = ride.totalMinutes - (ride.intervalReps * ride.intervalMinutes) - (ride.restMinutes * (ride.intervalReps - 1));
+        return [
+            `${formatMinutes(ride.totalMinutes)}`,
+            `${ride.intervalReps}x${formatMinutes(ride.intervalMinutes)}@${Math.round(ride.intervalWatts)}w${rest}`,
+            `Z${Math.floor(ride.intervalZone)}`,
+            `${ride.name}`,
+            `+${formatMinutes(continuousMinutes)}Z${Math.floor(ride.continuousZone)}@${Math.round(ride.continuousWatts)}w`,
+        ].join('|');
+    } else {
+        return [
+            `${formatMinutes(ride.totalMinutes)}`,
+            `${Math.round(ride.continuousWatts)}w`,
+            `Z${Math.floor(ride.continuousZone)}`,
+            `${ride.name}`
+        ].join('|');
+    }
+}
+
 
 // thoughts on how to create a schedule: 
 // 1. First figure out the target form/percentage/etc for each day.
@@ -144,37 +209,38 @@ export const CogganPowerZones: PowerZone[] = [
     { name: "Neuromuscular Power", value: 7, minPowerPct: 150, maxPowerPct: Infinity }
 ];
 
-export const targetCategories = [
+export const targetCategories: TargetCategory[] = [
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutesInZone: 30, maxMinutesInZone: 90 },
-    { name: "Long Ride", zone: 2, percentFtp: 62, minMinutesInZone: 120 },
-    { name: "Endurance", zone: 2.5, percentFtp: 72, minMinutesInZone: 40, maxMinutesInZone: 120 },
-    { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 90 },
-    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 30, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
+    { name: "Base Miles", zone: 2, percentFtp: 60, minMinutesInZone: 40, maxMinutesInZone: 120 },
+    { name: "Long Ride", zone: 2.5, percentFtp: 67, minMinutesInZone: 120 },
+    { name: "Endurance", zone: 2.6, percentFtp: 73, minMinutesInZone: 40, maxMinutesInZone: 120 },
+    { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 120 },
+    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
     { name: "Sweet Spot", zone: 3.6, percentFtp: 90, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
-    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 45, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 4 },
+    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 4 },
     { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 10, maxMinutesInZone: 24, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 3 },
-] as const satisfies TargetCategory[];
+];
 
-export const intervalLengths = [
-    { zone: 3.5, minMinutes: 20, maxMinutes: 90 },
-    { zone: 3.6, minMinutes: 10, maxMinutes: 60 },
-    { zone: 4, minMinutes: 8, maxMinutes: 30 },
-    { zone: 5, minMinutes: 3, maxMinutes: 8 }
-] as const satisfies IntervalLength[];
-
-export const intervalProgressions = [
+export const intervalProgressions: IntervalProgression[] = [
     { zone: 3.5, progressions: [[1, 20], [1, 30], [2, 20], [1, 45], [2, 30], [1, 60], [2, 45], [1, 90]] },
     { zone: 3.6, progressions: [[1, 10], [1, 15], [2, 10], [1, 20], [2, 15], [1, 30], [2, 20], [3, 15], [2, 25], [1, 50], [4, 15], [3, 20], [2, 30], [1, 60]] },
     { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [3, 15], [2, 25], [1, 45]] },
     { zone: 5, progressions: [[1, 3], [1, 5], [2, 3], [1, 6], [2, 5], [1, 8], [3, 5], [2, 8], [3, 6], [4, 6], [3, 8]] }
-] as const satisfies IntervalProgression[];
+];
 
 
-export type IntervalDefinition = [reps: number, minutes: number];
-export type IntervalProgression = {
+export type IntervalLength = {
     zone: number;
-    progressions: IntervalDefinition[];
+    minMinutes: number;
+    maxMinutes: number;
 }
+
+export const intervalLengths = [
+    { zone: 3.5, minMinutes: 20, maxMinutes: 90 },
+    { zone: 3.6, minMinutes: 10, maxMinutes: 60 },
+    { zone: 4, minMinutes: 8, maxMinutes: 45 },
+    { zone: 5, minMinutes: 3, maxMinutes: 8 }
+] as const satisfies IntervalLength[];
 
 export function computeTrainingLoadRanges(
     targetCategories: readonly TargetCategory[],
@@ -195,55 +261,125 @@ export function computeTrainingLoadRanges(
     return ranges;
 }
 
+export type TargetCategoryWithProgression = TargetCategory & Partial<CurrentIntervalProgression>;
+
+function mergeTargetCategoriesWithCurrentProgressions(
+    targetCategories: readonly TargetCategory[],
+    currentProgressions: CurrentIntervalProgressions
+): TargetCategoryWithProgression[] {
+    return targetCategories.map(category => {
+        const progression = currentProgressions.find(p => p.zone === category.zone);
+        if (progression) {
+            return { ...category, ...progression };
+        }
+        return category;
+    });
+}
 
 export function computeTargetRides(
     ftp: number,
     trainingLoadTarget: number,
     minimumRideMinutes: number,
-    maximumRideMinutes: number
-) {
-    const fn = (category: TargetCategory) => calculateHoursForTargetRide(category, trainingLoadTarget, ftp);
-    const rides = targetCategories
+    maximumRideMinutes: number,
+    currentIntervalProgressions: CurrentIntervalProgressions
+): TargetRide[] {
+    const targets = mergeTargetCategoriesWithCurrentProgressions(targetCategories, currentIntervalProgressions);
+    const fn = (category: TargetCategoryWithProgression) => calculateHoursForTargetRide(category, trainingLoadTarget, ftp);
+    const rides = targets
         .map(fn)
         .filter(ride => ride !== null)
-        .filter(ride => ride.minutes >= minimumRideMinutes && ride.minutes <= maximumRideMinutes);
+        .filter(ride => ride.totalMinutes >= minimumRideMinutes && ride.totalMinutes <= maximumRideMinutes);
     return rides;
 }
 
 function calculateHoursForTargetRide(
-    category: TargetCategory,
+    category: TargetCategory & Partial<CurrentIntervalProgression>,
     trainingLoadTarget: number,
     ftp: number
 ): TargetRide | null {
-    const np = category.percentFtp / 100 * ftp;
-    const np2 = Math.pow(np, 2);
-    const ftp2 = Math.pow(ftp, 2);
-    const hours = ((trainingLoadTarget / 100) * ftp2) / np2;
 
-    const minutes = Math.round(hours * 60);
-    if (category.minMinutesInZone && minutes < category.minMinutesInZone) {
-        return null; // Not enough time for this ride
+    if (category.continuousZone !== undefined && category.progression !== undefined) {
+        // we're in an interval zone. So we need to calculate the interval, then the rest, then the continuous part.
+        const intervalWatts = category.percentFtp / 100 * ftp;
+        const intervalReps = category.progression[0];
+        const intervalMinutes = category.progression[1];
+        const totalIntervalMinutes = intervalReps * intervalMinutes;
+        const totalIntervalRestMinutes = (Math.max(intervalReps - 1, 0)) * (category.minIntervalRestMinutes ?? 0);
+
+        const continuousTargetCategory = targetCategories.find(x => x.zone === category.continuousZone);
+        if (!continuousTargetCategory) {
+            console.log(`No continuous target category found for zone ${category.continuousZone}`);
+            return null;
+        }
+
+        // not sure when this would happen. 
+        if(category.maxMinutesInZone && totalIntervalMinutes > category.maxMinutesInZone) {
+            return null;
+        }
+        if(category.minMinutesInZone && totalIntervalMinutes < category.minMinutesInZone) {
+            return null;
+        }
+
+        const continuousWatts = continuousTargetCategory.percentFtp / 100 * ftp;
+
+        const intervalTSS = computeTrainingLoad(totalIntervalMinutes / 60, intervalWatts, ftp);
+        const intervalRestTSS = computeTrainingLoad(totalIntervalRestMinutes / 60, continuousWatts, ftp);
+
+        const totalIntervalTSS = intervalTSS + intervalRestTSS;
+
+        if (totalIntervalTSS > trainingLoadTarget) {
+            console.log(`Total interval TSS ${totalIntervalTSS} exceeds target ${trainingLoadTarget}`);
+            return null; // Not enough TSS for this ride
+        }
+
+        const remainingTSS = trainingLoadTarget - totalIntervalTSS;
+        const remainingMinutes = computeMinutesForTrainingLoad(continuousTargetCategory.percentFtp, ftp, remainingTSS);
+
+        const totalMinutes = Math.round(totalIntervalMinutes + totalIntervalRestMinutes + remainingMinutes);
+
+        if(category.maxMinutesTotal && totalMinutes > category.maxMinutesTotal) {
+            return null;
+        }
+
+        return {
+            name: category.name,
+            zone: category.zone,
+            continuousZone: category.continuousZone,
+            continuousWatts,
+            totalMinutes,
+            intervalReps,
+            intervalMinutes,
+            intervalWatts,
+            intervalZone: category.zone,
+            restMinutes: category.minIntervalRestMinutes
+        }
     }
-    if (category.maxMinutesInZone && minutes > category.maxMinutesInZone) {
-        return null; // Too much time for this ride
+
+    const totalMinutes = Math.round(computeMinutesForTrainingLoad(category.percentFtp, ftp, trainingLoadTarget));
+    if (category.minMinutesInZone && totalMinutes < category.minMinutesInZone) {
+        return null; 
+    }
+    if (category.maxMinutesInZone && totalMinutes > category.maxMinutesInZone) {
+        return null; 
     }
 
     return {
-        ...category,
-        minutes: Math.round(hours * 60),
-        power: Math.round(np)
+        name: category.name,
+        zone: category.zone,
+        continuousZone: category.zone,
+        continuousWatts: category.percentFtp / 100 * ftp,
+        totalMinutes
     };
 }
-
 
 type Zones = ReturnType<typeof calculateCogganPowerZones>;
 
 export const zonesToStrings = (zones: Zones) => {
     return Object.fromEntries(Object.entries(zones).map(([key, [min, max]]) => {
         if (max === Infinity) {
-            return [key, `${min.toFixed(0)}+ W`] as const;
+            return [key, `${min.toFixed(0)} + W`] as const;
         }
-        return [key, `${min.toFixed(0)}-${max.toFixed(0)} W`] as const;
+        return [key, `${min.toFixed(0)} - ${max.toFixed(0)} W`] as const;
     }));
 }
 

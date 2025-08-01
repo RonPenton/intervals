@@ -5,30 +5,32 @@ import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
-import { calculateCogganPowerZones, computeFatigue, computeFitness, computeRequiredTrainingLoadForNextMorningForm, computeTrainingLoadRanges, getPeakSevenDayTSS, IntervalRange, targetCategories, zonesToStrings } from './training';
+import { calculateCogganPowerZones, CurrentIntervalProgressions, getPeakSevenDayTSS, printTargetRide, zonesToStrings } from './training';
 
 const willRideToday = true;
-const daysToAdd = 10;
+const daysToAdd = 7;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
+//const ftp = 212;
 
-
-const intervalRanges: IntervalRange[] = [
-    { zone: 3.5, minReps: 2, maxReps: 4, minMinutes: 10, maxMinutes: 20, restMinutes: 15 },  // sweet spot
-    { zone: 4, minReps: 2, maxReps: 4, minMinutes: 10, maxMinutes: 20, restMinutes: 10 },   // threshold
-    { zone: 5, minReps: 3, maxReps: 6, minMinutes: 1, maxMinutes: 3, restMinutes: 5 },    // VO2 max
-]
+const currentIntervalProgressions: CurrentIntervalProgressions = [
+    { zone: 3.5, progression: [2, 20]},     // tempo intervals
+    { zone: 3.6, progression: [1, 10]},     // sweet spot
+    { zone: 4, progression: [1, 8] },       // threshold
+    { zone: 5, progression: [1, 3] },       // VO2 max
+];
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-29', targetFormPercent: -12 });     // Tuesday
-    setSchedule(schedules, { date: '2025-07-30', targetTrainingLoad: 10 });     // Wednesday
-    setSchedule(schedules, { date: '2025-07-31', targetForm: -10 });          // Thursday
-    setSchedule(schedules, { date: '2025-08-01', targetFormPercent: -10 });     // Friday
-    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 80 });     // Saturday
-    setSchedule(schedules, { date: '2025-08-03', targetTrainingLoad: 200 });    // Sunday
-    setSchedule(schedules, { date: '2025-08-04', targetForm: -15 });              // Monday
-    setSchedule(schedules, { date: '2025-08-05', targetForm: 'D-1' });          // Tuesday
-    setSchedule(schedules, { date: '2025-08-06', targetFormPercent: -30 });          // Wednesday
-    setSchedule(schedules, { date: '2025-08-07', targetForm: 'maintain' });          // Thursday
+    setSchedule(schedules, { date: '2025-07-31', targetFormPercent: -14 });         // Thursday
+    setSchedule(schedules, { date: '2025-08-01', targetFormPercent: -10 });         // Friday
+    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 80 });         // Saturday
+    setSchedule(schedules, { date: '2025-08-03', targetTrainingLoad: 200 });        // Sunday
+    setSchedule(schedules, { date: '2025-08-04', targetForm: -15 });                // Monday
+    setSchedule(schedules, { date: '2025-08-05', targetForm: 'maintain' });              // Tuesday
+    setSchedule(schedules, { date: '2025-08-06', targetForm: 'maintain' });              // Wednesday
+    setSchedule(schedules, { date: '2025-08-07', targetForm: 'maintain' });              // Thursday
+    setSchedule(schedules, { date: '2025-08-08', targetForm: 'D+3' });            // Friday
+    setSchedule(schedules, { date: '2025-08-09', targetTrainingLoad: 200 });        // Saturday
+    setSchedule(schedules, { date: '2025-08-10', targetForm: 'D+7' });              // Sunday
 }
 
 async function go() {
@@ -84,7 +86,7 @@ async function go() {
 
     setSchedules(schedules);
 
-    computeTrainingLoads(schedules, rides[0].currentFtp);
+    computeTrainingLoads(schedules, rides[0].currentFtp, currentIntervalProgressions);
 
     console.log('Past Week:');
 
@@ -106,11 +108,11 @@ async function go() {
 
         console.log(`- ${parts}`);
         if (record.rideOptions && record.rideOptions.length > 0) {
-            const opts = record.rideOptions.map(ride => {
-                const time = `${Math.floor(ride.minutes / 60)}:${String(ride.minutes % 60).padStart(2, '0')}`;
-                return `~${time}|~${ride.power}w|Z${Math.floor(ride.zone)}|${ride.name}`;
-            }).join(' ▓ ');
-            console.log(`   - ${opts}`);
+            for(const option of record.rideOptions) {
+                console.log(`    - ${printTargetRide(option)}`);
+            }
+            // const opts = record.rideOptions.map(printTargetRide).join(' ▓ ');
+            // console.log(`   - ${opts}`);
         }
     });
 

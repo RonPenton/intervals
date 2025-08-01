@@ -2,7 +2,7 @@ import { keysOf } from "tsc-utils";
 import { Activity, Wellness } from "./intervals-transformers";
 import { Temporal } from "temporal-polyfill";
 import { days } from "./days";
-import { computeFatigue, computeFitness, computeRequiredTrainingLoad, computeRequiredTrainingLoadFromFormPercentage, computeTargetRides, TargetRide } from "./training";
+import { computeFatigue, computeFitness, computeRequiredTrainingLoad, computeRequiredTrainingLoadFromFormPercentage, computeTargetRides, CurrentIntervalProgressions, TargetRide } from "./training";
 
 export type ScheduleId = {
     offset: number;
@@ -125,6 +125,7 @@ export function computeScheduleFromRides(
 export function computeTrainingLoads(
     schedules: ScheduleRecord[],
     ftp: number,
+    currentIntervalProgressions: CurrentIntervalProgressions
 ) {
 
     let fatigue = schedules[0].fatigue ?? 0;
@@ -189,7 +190,7 @@ export function computeTrainingLoads(
 
             tss = tss ?? 0;
 
-            const options = computeTargetRides(ftp, tss, record.minMinutes ?? 20, record.maxMinutes ?? 9999999)
+            const options = computeTargetRides(ftp, tss, record.minMinutes ?? 20, record.maxMinutes ?? 9999999, currentIntervalProgressions)
                 .filter(o => !record.minZone || o.zone >= record.minZone)
                 .filter(o => !record.maxZone || o.zone <= record.maxZone);
 

@@ -3,7 +3,7 @@ import { getZoneForRide } from "./training";
 
 export function pruneActivityFields(record: ICUActivity) {
     const {
-        icu_rolling_ftp,
+        icu_ftp,
         icu_training_load,
         icu_joules,
         icu_weighted_avg_watts,
@@ -30,7 +30,7 @@ export function pruneActivityFields(record: ICUActivity) {
     const celsiusToFahrenheit = (celsius: number) => ((celsius * 9 / 5) + 32).toFixed(0);
 
     return {
-        currentFtp: icu_rolling_ftp,
+        currentFtp: icu_ftp,
         trainingLoad: icu_training_load,
         kj: Number((icu_joules / 1000).toFixed(0)),
         normalizedWatts: icu_weighted_avg_watts,
@@ -45,7 +45,7 @@ export function pruneActivityFields(record: ICUActivity) {
         intensityFactor: Number(icu_intensity.toFixed(2)),
         fatigue: Number(icu_atl.toFixed(2)),
         fitness: Number(icu_ctl.toFixed(2)),
-        zone: getZoneForRide(icu_rolling_ftp, icu_weighted_avg_watts)
+        zone: getZoneForRide(icu_ftp, icu_weighted_avg_watts)
     };
 }
 

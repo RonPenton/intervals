@@ -84,3 +84,34 @@ TSS = -36FatY + (-FormP + 1)(41FitY)
 TSS = -36FatY + (41FitY)(1 - FormP)
       ------------------------------
               (FormP - 5)
+
+
+
+      (sec x NP x IF)
+TSS = ---------------  x 100
+        (FTP x 3600) 
+
+
+      (sec x NP x (NP/FTP))
+TSS =  --------------------         x 100
+           (FTP x 3600)         
+
+      (sec x (NP^2/FTP))
+TSS =  --------------------         x 100
+           (FTP x 3600)         
+
+          (sec*NP^2/FTP)
+TSS =  --------------------         x 100
+           (FTP x 3600)         
+
+
+             (sec*NP^2)
+TSS =  --------------------         x 100
+           (FTP^2 x 3600)         
+
+
+             hours*NP^2
+TSS =  --------------------         x 100
+                FTP^2
+
+

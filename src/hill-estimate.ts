@@ -6,8 +6,8 @@ const bikeWeightPounds = 20;
 const riderWeightPounds = 400;
 
 
-const hillMiles = 0.6;
-const elevationFeet = 82;
+const hillMiles = 1.2;
+const elevationFeet = 640;
 const speedMph = 5.3;
 const ftp = 212;
 //const power = 168;
@@ -25,6 +25,7 @@ async function go() {
         bikeWeightPounds + riderWeightPounds,
         percentOfCapacity
     );
+    console.log(`Hill length: ${hillMiles} miles, elevation gain: ${elevationFeet} feet`);
     const time2 = `${Math.floor(secondsClimbing / 60)}:${String(Math.round(secondsClimbing % 60)).padStart(2, '0')}`;
     console.log(`Estimated climb time at ${power.toFixed(2)} W: ${time2} (${(Math.round(percentOfCapacity * 100))}% of Capacity)`);
     const mph = hillMiles / (secondsClimbing / 3600);
