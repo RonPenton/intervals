@@ -5,7 +5,8 @@ import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
 import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
-import { calculateCogganPowerZones, CurrentIntervalProgressions, getPeakSevenDayTSS, printTargetRide, zonesToStrings } from './training';
+import { calculateCogganPowerZones, getPeakSevenDayTSS, printTargetRide, zonesToStrings } from './training';
+import { CurrentIntervalProgressions } from './types';
 
 const willRideToday = true;
 const daysToAdd = 7;
@@ -13,24 +14,20 @@ const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 //const ftp = 212;
 
 const currentIntervalProgressions: CurrentIntervalProgressions = [
-    { zone: 3.5, progression: [2, 20]},     // tempo intervals
-    { zone: 3.6, progression: [1, 10]},     // sweet spot
-    { zone: 4, progression: [1, 8] },       // threshold
-    { zone: 5, progression: [1, 3] },       // VO2 max
+    { zone: 3.5, progression: [3, 20]},     // tempo intervals
+    { zone: 3.6, progression: [1, 15]},     // sweet spot
+    { zone: 4, progression: [2, 8] },       // threshold
+    { zone: 5, progression: [2, 3] },       // VO2 max
 ];
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-07-31', targetFormPercent: -14 });         // Thursday
-    setSchedule(schedules, { date: '2025-08-01', targetFormPercent: -10 });         // Friday
-    setSchedule(schedules, { date: '2025-08-02', targetTrainingLoad: 80 });         // Saturday
-    setSchedule(schedules, { date: '2025-08-03', targetTrainingLoad: 200 });        // Sunday
-    setSchedule(schedules, { date: '2025-08-04', targetForm: -15 });                // Monday
-    setSchedule(schedules, { date: '2025-08-05', targetForm: 'maintain' });              // Tuesday
-    setSchedule(schedules, { date: '2025-08-06', targetForm: 'maintain' });              // Wednesday
-    setSchedule(schedules, { date: '2025-08-07', targetForm: 'maintain' });              // Thursday
-    setSchedule(schedules, { date: '2025-08-08', targetForm: 'D+3' });            // Friday
-    setSchedule(schedules, { date: '2025-08-09', targetTrainingLoad: 200 });        // Saturday
-    setSchedule(schedules, { date: '2025-08-10', targetForm: 'D+7' });              // Sunday
+    setSchedule(schedules, { date: '2025-08-15', targetForm: 'decay' });              // Friday
+    setSchedule(schedules, { date: '2025-08-16', targetFormPercent: -30 });                // Saturday
+    setSchedule(schedules, { date: '2025-08-17', targetFormPercent: -30 });                // Sunday
+    setSchedule(schedules, { date: '2025-08-18', targetFormPercent: -22 });              // Monday
+    setSchedule(schedules, { date: '2025-08-19', targetFormPercent: -25 });              // Tuesday
+    setSchedule(schedules, { date: '2025-08-20', targetFormPercent: -25 });              // Wednesday
+    setSchedule(schedules, { date: '2025-08-21', targetTrainingLoad: 160 });              // Thursday
 }
 
 async function go() {

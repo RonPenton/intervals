@@ -1,6 +1,8 @@
+import Decimal from "decimal.js";
 import { Temporal } from "temporal-polyfill";
 import { Activity } from "./intervals-transformers";
 import { addDays, getToday, lessThan, moreThanEqual } from "./days";
+import { CurrentIntervalProgression, CurrentIntervalProgressions, IntervalLength, IntervalProgression, IntervalSimplified, PowerZone, TargetCategory, TargetCategoryWithProgression, TargetRide, TargetRideInterval } from "./types";
 
 export function computeFitness(
     fitnessYesterday: number,
@@ -95,55 +97,6 @@ export const calculateCogganPowerZones = (ftp: number) => {
     );
 }
 
-export type PowerZone = {
-    name: string;
-    value: number;
-    minPowerPct: number;
-    maxPowerPct: number;
-}
-
-export type TargetCategory = {
-    name: string;
-    zone: number;
-    percentFtp: number;
-    minMinutesInZone?: number;
-    maxMinutesInZone?: number;
-    maxMinutesTotal?: number;
-    minIntervalRestMinutes?: number;
-    continuousZone?: number;
-}
-
-export type CurrentIntervalProgression = {
-    zone: number;
-    progression: IntervalDefinition;
-};
-
-export type CurrentIntervalProgressions = CurrentIntervalProgression[];
-export type IntervalDefinition = [reps: number, minutes: number];
-
-export type IntervalProgression = {
-    zone: number;
-    progressions: IntervalDefinition[];
-}
-
-export type TargetRideContinuous = {
-    name: string;
-    zone: number;
-    continuousZone: number;
-    continuousWatts: number;
-    totalMinutes: number;
-}
-
-export type TargetRideInterval = TargetRideContinuous & {
-    intervalZone: number;
-    intervalWatts: number;
-    intervalReps: number;
-    intervalMinutes: number;
-    restMinutes: number;            // not total rest minutes, just the rest between intervals.
-}
-
-export type TargetRide = TargetRideContinuous | TargetRideInterval;
-
 export function formatMinutes(minutes: number): string {
     const pad2 = (num: number) => String(num).padStart(2, '0');
     if (minutes > 60) {
@@ -212,28 +165,23 @@ export const CogganPowerZones: PowerZone[] = [
 export const targetCategories: TargetCategory[] = [
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutesInZone: 30, maxMinutesInZone: 90 },
     { name: "Base Miles", zone: 2, percentFtp: 60, minMinutesInZone: 40, maxMinutesInZone: 120 },
-    { name: "Long Ride", zone: 2.5, percentFtp: 67, minMinutesInZone: 120 },
+    { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutesInZone: 120 },
     { name: "Endurance", zone: 2.6, percentFtp: 73, minMinutesInZone: 40, maxMinutesInZone: 120 },
     { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 120 },
-    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
-    { name: "Sweet Spot", zone: 3.6, percentFtp: 90, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 10 },
-    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 4 },
-    { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 10, maxMinutesInZone: 24, continuousZone: 2, maxMinutesTotal: 120, minIntervalRestMinutes: 3 },
+    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
+    { name: "Sweet Spot", zone: 3.6, percentFtp: 90, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
+    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 4 },
+    { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 10, maxMinutesInZone: 24, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 3 },
 ];
 
 export const intervalProgressions: IntervalProgression[] = [
-    { zone: 3.5, progressions: [[1, 20], [1, 30], [2, 20], [1, 45], [2, 30], [1, 60], [2, 45], [1, 90]] },
+    { zone: 3.5, progressions: [[1, 20], [1, 30], [2, 20], [3, 20], [1, 45], [2, 30], [1, 60], [2, 45], [1, 90]] },
     { zone: 3.6, progressions: [[1, 10], [1, 15], [2, 10], [1, 20], [2, 15], [1, 30], [2, 20], [3, 15], [2, 25], [1, 50], [4, 15], [3, 20], [2, 30], [1, 60]] },
-    { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [3, 15], [2, 25], [1, 45]] },
-    { zone: 5, progressions: [[1, 3], [1, 5], [2, 3], [1, 6], [2, 5], [1, 8], [3, 5], [2, 8], [3, 6], [4, 6], [3, 8]] }
+    { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 8], [2, 12], [1, 24], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [3, 15], [2, 25], [1, 45]] },
+    { zone: 5, progressions: [[1, 3], [1, 5], [2, 3], [1, 6], [3, 3], [2, 5], [1, 8], [4, 3], [3, 5], [2, 8], [3, 6], [4, 6], [3, 8]] }
 ];
 
 
-export type IntervalLength = {
-    zone: number;
-    minMinutes: number;
-    maxMinutes: number;
-}
 
 export const intervalLengths = [
     { zone: 3.5, minMinutes: 20, maxMinutes: 90 },
@@ -261,7 +209,6 @@ export function computeTrainingLoadRanges(
     return ranges;
 }
 
-export type TargetCategoryWithProgression = TargetCategory & Partial<CurrentIntervalProgression>;
 
 function mergeTargetCategoriesWithCurrentProgressions(
     targetCategories: readonly TargetCategory[],
@@ -313,10 +260,10 @@ function calculateHoursForTargetRide(
         }
 
         // not sure when this would happen. 
-        if(category.maxMinutesInZone && totalIntervalMinutes > category.maxMinutesInZone) {
+        if (category.maxMinutesInZone && totalIntervalMinutes > category.maxMinutesInZone) {
             return null;
         }
-        if(category.minMinutesInZone && totalIntervalMinutes < category.minMinutesInZone) {
+        if (category.minMinutesInZone && totalIntervalMinutes < category.minMinutesInZone) {
             return null;
         }
 
@@ -328,7 +275,7 @@ function calculateHoursForTargetRide(
         const totalIntervalTSS = intervalTSS + intervalRestTSS;
 
         if (totalIntervalTSS > trainingLoadTarget) {
-            console.log(`Total interval TSS ${totalIntervalTSS} exceeds target ${trainingLoadTarget}`);
+            // console.log(`Total interval TSS ${totalIntervalTSS} exceeds target ${trainingLoadTarget}`);
             return null; // Not enough TSS for this ride
         }
 
@@ -337,11 +284,11 @@ function calculateHoursForTargetRide(
 
         const totalMinutes = Math.round(totalIntervalMinutes + totalIntervalRestMinutes + remainingMinutes);
 
-        if(category.maxMinutesTotal && totalMinutes > category.maxMinutesTotal) {
+        if (category.maxMinutesTotal && totalMinutes > category.maxMinutesTotal) {
             return null;
         }
 
-        return {
+        const ride = {
             name: category.name,
             zone: category.zone,
             continuousZone: category.continuousZone,
@@ -353,14 +300,22 @@ function calculateHoursForTargetRide(
             intervalZone: category.zone,
             restMinutes: category.minIntervalRestMinutes
         }
+
+        // const normalizedPower = computeNormalizedPowerForIntervals(ride);
+        // const tss = computeTrainingLoad(ride.totalMinutes / 60, normalizedPower, ftp);
+        // const pctError = Math.abs((tss - trainingLoadTarget) / trainingLoadTarget);
+        // console.log(`Requested TSS: ${trainingLoadTarget} vs Computed TSS: ${tss}; Error: ${(pctError * 100).toFixed(0)}% for ride: ${printTargetRide(ride)}`);
+
+
+        return ride;
     }
 
     const totalMinutes = Math.round(computeMinutesForTrainingLoad(category.percentFtp, ftp, trainingLoadTarget));
     if (category.minMinutesInZone && totalMinutes < category.minMinutesInZone) {
-        return null; 
+        return null;
     }
     if (category.maxMinutesInZone && totalMinutes > category.maxMinutesInZone) {
-        return null; 
+        return null;
     }
 
     return {
@@ -533,3 +488,75 @@ export function getPeakSevenDayTSS(
 
     return { peakTSS, peakFrom: from, peakTo: addDays(from, 6) };
 }
+
+export function computeNormalizedPowerForIntervals(ride: TargetRide) {
+    let pows: Decimal = new Decimal(0);
+    let count = 0;
+    const rolling: number[] = [];
+
+    const add = (a: number, b: number) => a + b;
+
+    // normalized power is 30s moving average, to the 4th power and summed, then averaged, then 4th root. 
+    for (const power of powerStream(ride)) {
+        rolling.push(power);
+
+        if (rolling.length > 30) { rolling.shift() }
+        if (rolling.length == 30) {
+            const average = rolling.reduce(add, 0) / rolling.length;
+            pows = pows.add(Decimal.pow(average, 4));
+            count++;
+        }
+    }
+
+    const mean = pows.dividedBy(count);
+    const root = mean.pow(1 / 4);
+    return root.toNumber();
+}
+
+function getSimplifiedIntervals(
+    targetRide: TargetRide
+): IntervalSimplified[] {
+    if ('intervalZone' in targetRide) {
+
+        const restMinutes = targetRide.intervalReps - 1 * targetRide.restMinutes;
+        const intervalMinutes = targetRide.intervalReps * targetRide.intervalMinutes;
+        const remaining = targetRide.totalMinutes - intervalMinutes - restMinutes;
+        const half = remaining / 2;
+
+        const intervals = [{ watts: targetRide.continuousWatts, seconds: half * 60 }];
+        for (let i = 0; i < targetRide.intervalReps; i++) {
+            intervals.push({ watts: targetRide.intervalWatts, seconds: targetRide.intervalMinutes * 60 });
+            if (i < targetRide.intervalReps - 1) {
+                intervals.push({ watts: targetRide.continuousWatts, seconds: targetRide.restMinutes * 60 });
+            }
+        }
+        intervals.push({ watts: targetRide.continuousWatts, seconds: half * 60 });
+        return intervals;
+    }
+    else {
+        return [{
+            watts: targetRide.continuousWatts,
+            seconds: targetRide.totalMinutes * 60
+        }];
+    }
+}
+
+export function* powerStream(
+    ride: TargetRide
+) {
+    const intervals = getSimplifiedIntervals(ride);
+    let interval = 0;
+    let time = 0;
+    let start = 0;
+    while (intervals[interval]) {
+        const i = intervals[interval];
+        if (time - start > i.seconds) {
+            start += i.seconds;
+            interval++;
+            continue;
+        }
+        yield i.watts;
+        time++;
+    }
+}
+
