@@ -21,8 +21,6 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
 ];
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-08-15', targetForm: 'decay' });              // Friday
-    setSchedule(schedules, { date: '2025-08-16', targetFormPercent: -30 });                // Saturday
     setSchedule(schedules, { date: '2025-08-17', targetFormPercent: -30 });                // Sunday
     setSchedule(schedules, { date: '2025-08-18', targetFormPercent: -22 });              // Monday
     setSchedule(schedules, { date: '2025-08-19', targetFormPercent: -25 });              // Tuesday
