@@ -9,23 +9,29 @@ import { calculateCogganPowerZones, getPeakSevenDayTSS, printTargetRide, zonesTo
 import { CurrentIntervalProgressions } from './types';
 
 const willRideToday = true;
-const daysToAdd = 7;
+const daysToAdd = 10;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 //const ftp = 212;
 
 const currentIntervalProgressions: CurrentIntervalProgressions = [
-    { zone: 3.5, progression: [3, 20]},     // tempo intervals
-    { zone: 3.6, progression: [1, 15]},     // sweet spot
+    { zone: 3.5, progression: [3, 20] },     // tempo intervals
+    { zone: 3.6, progression: [1, 15] },     // sweet spot
     { zone: 4, progression: [2, 8] },       // threshold
     { zone: 5, progression: [2, 3] },       // VO2 max
 ];
 
 function setSchedules(schedules: ScheduleRecord[]) {
-    setSchedule(schedules, { date: '2025-08-17', targetFormPercent: -30 });                // Sunday
-    setSchedule(schedules, { date: '2025-08-18', targetFormPercent: -22 });              // Monday
-    setSchedule(schedules, { date: '2025-08-19', targetFormPercent: -25 });              // Tuesday
-    setSchedule(schedules, { date: '2025-08-20', targetFormPercent: -25 });              // Wednesday
-    setSchedule(schedules, { date: '2025-08-21', targetTrainingLoad: 160 });              // Thursday
+
+    setSchedule(schedules, { date: '2025-08-22', targetFormPercent: -20 });               // Friday
+    setSchedule(schedules, { date: '2025-08-23', targetTrainingLoad: 5 });                // Saturday
+    setSchedule(schedules, { date: '2025-08-24', targetTrainingLoad: 125 });               // Sunday
+    setSchedule(schedules, { date: '2025-08-25', targetFormPercent: -12 });               // Monday
+    setSchedule(schedules, { date: '2025-08-26', targetFormPercent: -10 });               // Tuesday
+    setSchedule(schedules, { date: '2025-08-27', targetFormPercent: -10 });               // Wednesday
+    setSchedule(schedules, { date: '2025-08-28', targetTomorrowFormPercent: -5 });        // Thursday
+    setSchedule(schedules, { date: '2025-08-29', targetTrainingLoad: 0 });                // Friday Recovery Bike?
+    setSchedule(schedules, { date: '2025-08-30', targetTrainingLoad: 0 });                // Saturday Hike?
+    setSchedule(schedules, { date: '2025-08-31', targetTrainingLoad: 270 });              // Sunday METRIC!!
 }
 
 async function go() {
@@ -33,16 +39,14 @@ async function go() {
     console.log('Fetching rides from Intervals.icu...');
     const rawRides = await getRides(seasonStart);
     const rides = rawRides.map(pruneActivityFields);
-
-    fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
-
-    const outputFile = './activities.json';
-    const activities = JSON.stringify(rides);
-    fs.writeFileSync(outputFile, activities);
-
     const wellness = (await getWellness()).map(pruneWellnessFields);;
-    const wellnessFile = './wellness.json';
-    fs.writeFileSync(wellnessFile, JSON.stringify(wellness));
+
+    // fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
+    // const outputFile = './activities.json';
+    // const activities = JSON.stringify(rides);
+    // fs.writeFileSync(outputFile, activities);
+    // const wellnessFile = './wellness.json';
+    // fs.writeFileSync(wellnessFile, JSON.stringify(wellness));
 
     const today = getToday();
     const tomorrow = addDays(today, 1);
@@ -103,7 +107,7 @@ async function go() {
 
         console.log(`- ${parts}`);
         if (record.rideOptions && record.rideOptions.length > 0) {
-            for(const option of record.rideOptions) {
+            for (const option of record.rideOptions) {
                 console.log(`    - ${printTargetRide(option)}`);
             }
             // const opts = record.rideOptions.map(printTargetRide).join(' ▓ ');

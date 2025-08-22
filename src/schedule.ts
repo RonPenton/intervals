@@ -2,7 +2,18 @@ import { keysOf } from "tsc-utils";
 import { Activity, Wellness } from "./intervals-transformers";
 import { Temporal } from "temporal-polyfill";
 import { days } from "./days";
-import { computeFatigue, computeFitness, computeRequiredTrainingLoad, computeRequiredTrainingLoadFromFormPercentage, computeTargetRides, CurrentIntervalProgressions, TargetRide } from "./training";
+import {
+    computeFatigue,
+    computeFitness,
+    computeRequiredTrainingLoad,
+    computeRequiredTrainingLoadForNextMorningForm,
+    computeRequiredTrainingLoadForNextMorningFormPercentage,
+    computeRequiredTrainingLoadForTargetFatigue,
+    computeRequiredTrainingLoadForTargetFitness,
+    computeRequiredTrainingLoadFromFormPercentage,
+    computeTargetRides
+} from "./training";
+import { CurrentIntervalProgressions, TargetRide } from "./types";
 
 export type ScheduleId = {
     offset: number;
@@ -24,6 +35,11 @@ export type ScheduleFields = {
 
     targetForm?: number | 'decay' | 'maintain' | Delta;
     targetFormPercent?: number | Delta;
+    targetTomorrowForm?: number;
+    targetTomorrowFormPercent?: number;
+    targetFitness?: number | 'maintain' | Delta;
+    targetFatigue?: number | 'maintain' | Delta;
+
     targetTrainingLoad?: number;
     minMinutes?: number;
     maxMinutes?: number;
@@ -153,6 +169,64 @@ export function computeTrainingLoads(
             targetFormPercent = targetFormPercent / 100;
 
             const tss = Math.round(computeRequiredTrainingLoadFromFormPercentage(fitness, fatigue, targetFormPercent));
+            record.trainingLoad = tss;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.trainingLoad === undefined && record.targetTomorrowForm !== undefined) {
+            let targetTomorrowForm = record.targetTomorrowForm;
+
+            const tss = Math.round(computeRequiredTrainingLoadForNextMorningForm(fitness, fatigue, targetTomorrowForm));
+            record.trainingLoad = tss;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.trainingLoad === undefined && record.targetFitness !== undefined) {
+            let targetFitness = record.targetFitness;
+
+            if (typeof targetFitness === 'string') {
+                if (targetFitness === 'maintain') {
+                    targetFitness = fitness;
+                }
+                else {
+                    const fitY = schedules[i - 1].fitness ?? 0;
+                    const val = Number(targetFitness.substring(1));
+                    targetFitness = fitY + val;
+                }
+            }
+
+            const tss = Math.round(computeRequiredTrainingLoadForTargetFitness(fitness, targetFitness));
+            record.trainingLoad = tss;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.trainingLoad === undefined && record.targetFatigue !== undefined) {
+            let targetFatigue = record.targetFatigue;
+
+            if (typeof targetFatigue === 'string') {
+                if (targetFatigue === 'maintain') {
+                    targetFatigue = fatigue;
+                }
+                else {
+                    const fatY = schedules[i - 1].fatigue ?? 0;
+                    const val = Number(targetFatigue.substring(1));
+                    targetFatigue = fatY + val;
+                }
+            }
+
+            const tss = Math.round(computeRequiredTrainingLoadForTargetFatigue(fatigue, targetFatigue));
+            record.trainingLoad = tss;
+            record.fatigue = computeFatigue(fatigue, tss);
+            record.fitness = computeFitness(fitness, tss);
+            record.form = record.fitness - record.fatigue;
+        }
+        else if (record.trainingLoad === undefined && record.targetTomorrowFormPercent !== undefined) {
+            let targetTomorrowFormPercent = record.targetTomorrowFormPercent;
+
+            const tss = Math.round(computeRequiredTrainingLoadForNextMorningFormPercentage(fitness, fatigue, targetTomorrowFormPercent));
             record.trainingLoad = tss;
             record.fatigue = computeFatigue(fatigue, tss);
             record.fitness = computeFitness(fitness, tss);

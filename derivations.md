@@ -115,3 +115,72 @@ TSS =  --------------------         x 100
                 FTP^2
 
 
+
+
+ # Computing Today's TSS from Tomorrow's desired Form Percentage
+
+T -> Today
+Y -> Yesterday
+M -> Tomorrow
+% -> Percent
+
+FitT = FitY + [(TSS - FitY) / 42]
+FatT = FatY + [(TSS - FatY) / 7]
+
+
+FitM = FitT + [(0 - FitT) / 42]
+42FitM = 42FitT + (0 - FitT)
+42FitM = 41FitT
+FitM = (41/42)FitT
+
+FatM = FatT + [(0 - FatT) / 7]
+7FatM = 7FatT + (0 - FatT)
+7FatM = 6FatT
+FatM = (6/7)FatT
+
+FormM = FitM - FatM
+FormM% = (FitM - FatM) / FitM
+
+FormM% = [(41/42)(FitY + [(TSS - FitY) / 42]) - (6/7)(FatY + [(TSS - FatY) / 7])] / (41/42)(FitY + [(TSS - FitY) / 42])
+
+FormM% = [(41/42)(FitY + [(TSS - FitY) / 42]) - (6/7)(FatY + [(TSS - FatY) / 7])]
+                  ------------------------------------------------
+                         (41/42)(FitY + [(TSS - FitY) / 42])
+
+41            TSS - FitY
+-- x (FitY + ------------)  = A
+42                42
+
+              
+41 x (42FitY + TSS - FitY)  = 42A
+
+1722FitY + 41TSS - 41FitY - 42A
+1681FitY + 41TSS = 42A
+
+FormM% = 1 - [216(6FatY + TSS)] / [41(41FitY + TSS)]
+
+TSS = 1296FatY - 1681(1 - FormM%)FitY
+        ------------------------------
+                41(1 - FormM%) - 216
+
+
+
+FitT = FitY + [(TSS - FitY) / 42]
+
+              (TSS - FitY)
+FitT = FitY + ------------
+                   42
+
+42FitT = 42FitY + (TSS - FitY)                   
+
+42FitT = 41FitY + TSS
+
+TSS = 42FitT - 41FitY
+
+              (TSS - FatY)
+FatT = FatY + ------------
+                   7
+
+7FatT = 7FatY + (TSS - FatY)
+7FatT = 6FatY + TSS
+TSS = 7FatT - 6FatY
