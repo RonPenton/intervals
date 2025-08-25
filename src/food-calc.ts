@@ -12,16 +12,37 @@ const rideSpeedMph = 12;
 const rideDistanceMiles = 65;
 const rideDurationHours = rideDistanceMiles / rideSpeedMph;
 const feedIntervalMinutes = 45;
+const buffer = 1.0;
 
 
 const foods = {
     gummies: {
         servingCarbGrams: 22,
-        unitsPerServing: 9
+        unitsPerServing: 9,
+        gramsPerServing: 32,
+        gramsPerContainer: 2268,
+        pricePerContainer: 21.20
     },
     bloks: {
         servingCarbGrams: 24,
-        unitsPerServing: 3
+        unitsPerServing: 3,
+        gramsPerServing: 30,
+        gramsPerContainer: 1080,
+        pricePerContainer: 47.24
+    },
+    fruitGems: {
+        servingCarbGrams: 23,
+        unitsPerServing: 2,
+        gramsPerServing: 27,
+        gramsPerContainer: 2268,
+        pricePerContainer: 26.99
+    },
+    nutsdotcomFruitGems: {
+        servingCarbGrams: 34,
+        unitsPerServing: 2.65,
+        gramsPerServing: 40,
+        gramsPerContainer: 2268,
+        pricePerContainer: 31.48
     }
 } as const;
 
@@ -47,35 +68,41 @@ async function go() {
         const carbCaloriesPerHour = caloriesPerHour * carbPercentage;
         const fatCaloriesPerHour = caloriesPerHour - carbCaloriesPerHour;
         const carbGramsPerHour = carbCaloriesPerHour / 4;
+        const date = ride.start_date_local.split('T')[0];
         return {
             ...ride,
+            date,
             hours,
             caloriesPerHour,
             carbCaloriesPerHour,
             fatCaloriesPerHour,
-            carbGramsPerHour
+            carbGramsPerHour,
+            carbPercentage
         }
     });
 
-
+    const m = (meters: number) => (meters / 1609.34).toFixed(0);
 
     console.log(`Found ${rides.length} rides in zone ${zone} with a minimum duration of ${minHours} hours:`);
     rides.forEach(ride => {
-        console.log(`- ${ride.start_date} - ${ride.name} (${ride.hours.toFixed(1)} hours, ${ride.icu_intensity} IF, ${ride.carbCaloriesPerHour.toFixed(0)} carb calories per hour, ${ride.carbGramsPerHour.toFixed(0)} g/hr)`);
+        console.log(`- ${ride.date}, ${m(ride.distance)} miles, ${ride.hours.toFixed(1)} hours, ${ride.icu_intensity} IF, ${ride.calories} calories, ~${(ride.carbPercentage * 100).toFixed(1)}% calories from carbs, ${ride.carbCaloriesPerHour.toFixed(0)} carb cals per hour, ${ride.carbGramsPerHour.toFixed(0)} g/hr`);
     });
 
     const averageCarbGramsPerHour = rides.reduce((sum, ride) => sum + ride.carbGramsPerHour, 0) / rides.length;
     console.log(`Average carb grams per hour: ${averageCarbGramsPerHour.toFixed(0)}`);
 
+    const adjustedCarbGramsPerHour = averageCarbGramsPerHour * buffer;
+    console.log(`Adjusted carb grams per hour (with ${((buffer - 1) * 100).toFixed(0)}% buffer): ${adjustedCarbGramsPerHour.toFixed(0)}`);
+
     console.log(`Target ride distance: ${rideDistanceMiles} miles`);
     console.log(`Target ride zone: ${zone}`);
     console.log(`Target ride time: ${rideDurationHours.toFixed(1)} hours`);
-    
 
-    const totalCarbs = averageCarbGramsPerHour * rideDurationHours;
+
+    const totalCarbs = adjustedCarbGramsPerHour * rideDurationHours;
     console.log(`Estimated total carbs needed: ${totalCarbs.toFixed(0)} grams`);
 
-    const carbsPerPeriod = feedIntervalMinutes / 60 * averageCarbGramsPerHour;
+    const carbsPerPeriod = feedIntervalMinutes / 60 * adjustedCarbGramsPerHour;
     console.log(`Estimated carbs needed per feeding period: ${carbsPerPeriod.toFixed(0)} grams`);
 
     console.log(`Chosen food: ${chosenFood}`);
@@ -85,7 +112,11 @@ async function go() {
     const numberPerPeriod = carbsPerPeriod / carbsPerUnit;
     console.log(`Number of ${chosenFood} per ${feedIntervalMinutes} minutes: ${Math.round(numberPerPeriod)}`);
 
-    const caloriesPerHour = averageCarbGramsPerHour * 4;
+    const servingsPerPeriod = carbsPerPeriod / foods[chosenFood].servingCarbGrams;
+    const gramsPerPeriod = servingsPerPeriod * foods[chosenFood].gramsPerServing;
+    console.log(`Servings of ${chosenFood} per ${feedIntervalMinutes} minutes: ${servingsPerPeriod.toFixed(1)} (${gramsPerPeriod.toFixed(0)} grams)`);
+
+    const caloriesPerHour = adjustedCarbGramsPerHour * 4;
     console.log(`Calorie consumption per hour: ${caloriesPerHour.toFixed(0)} calories`);
 
     const feedsPerRide = rideDurationHours / (feedIntervalMinutes / 60);
@@ -94,6 +125,14 @@ async function go() {
     const totalUnitsToPack = Math.round(feedsPerRide) * Math.round(numberPerPeriod);
     console.log(`Total ${chosenFood} to pack: ${totalUnitsToPack.toFixed(0)} (${feedsPerRide.toFixed(0)} x ${numberPerPeriod.toFixed(0)})`);
 
+    const servingsPerContainer = foods[chosenFood].gramsPerContainer / foods[chosenFood].gramsPerServing;
+    console.log(`Servings per container: ${servingsPerContainer.toFixed(1)}`);
+
+    const costPerServing = foods[chosenFood].pricePerContainer / servingsPerContainer;
+    console.log(`Cost per serving: $${costPerServing.toFixed(2)}`);
+
+    const costOfRide = servingsPerPeriod * feedsPerRide * costPerServing;
+    console.log(`Estimated cost of food for the ride: $${costOfRide.toFixed(2)}`);
 }
 
 void go();

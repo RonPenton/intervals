@@ -29,6 +29,7 @@ export const CogganPowerZones: PowerZone[] = [
 ];
 
 export const targetCategories: TargetCategory[] = [
+    { name: "Stroll", zone: 1.1, percentFtp: 30, minMinutesInZone: 1, maxMinutesInZone: 90 },
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutesInZone: 30, maxMinutesInZone: 90 },
     { name: "Base Miles", zone: 2, percentFtp: 60, minMinutesInZone: 40, maxMinutesInZone: 120 },
     { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutesInZone: 120 },

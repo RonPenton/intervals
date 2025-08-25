@@ -22,16 +22,17 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
 
 function setSchedules(schedules: ScheduleRecord[]) {
 
-    setSchedule(schedules, { date: '2025-08-22', targetFormPercent: -20 });               // Friday
-    setSchedule(schedules, { date: '2025-08-23', targetTrainingLoad: 5 });                // Saturday
-    setSchedule(schedules, { date: '2025-08-24', targetTrainingLoad: 125 });               // Sunday
-    setSchedule(schedules, { date: '2025-08-25', targetFormPercent: -12 });               // Monday
-    setSchedule(schedules, { date: '2025-08-26', targetFormPercent: -10 });               // Tuesday
+    setSchedule(schedules, { date: '2025-08-25', targetFormPercent: -14 });               // Monday
+    setSchedule(schedules, { date: '2025-08-26', targetFormPercent: -12 });               // Tuesday
     setSchedule(schedules, { date: '2025-08-27', targetFormPercent: -10 });               // Wednesday
-    setSchedule(schedules, { date: '2025-08-28', targetTomorrowFormPercent: -5 });        // Thursday
-    setSchedule(schedules, { date: '2025-08-29', targetTrainingLoad: 0 });                // Friday Recovery Bike?
-    setSchedule(schedules, { date: '2025-08-30', targetTrainingLoad: 0 });                // Saturday Hike?
-    setSchedule(schedules, { date: '2025-08-31', targetTrainingLoad: 270 });              // Sunday METRIC!!
+    setSchedule(schedules, { date: '2025-08-28', targetTomorrowFormPercent: 10 });        // Thursday
+    setSchedule(schedules, { date: '2025-08-29', targetTrainingLoad: 10 });                // Friday Recovery Bike?
+    setSchedule(schedules, { date: '2025-08-30', targetTrainingLoad: 270 });                // Saturday Hike?
+    setSchedule(schedules, { date: '2025-08-31', targetTrainingLoad: 0 });              // Sunday METRIC!!
+    setSchedule(schedules, { date: '2025-09-01', targetFormPercent: -20 });               // Monday
+    setSchedule(schedules, { date: '2025-09-02', targetFormPercent: -20 });               // Tuesday
+    setSchedule(schedules, { date: '2025-09-03', targetFormPercent: -20 });               // Wednesday
+    setSchedule(schedules, { date: '2025-09-04', targetFormPercent: -20 });        // Thursday
 }
 
 async function go() {
