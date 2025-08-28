@@ -14,6 +14,58 @@ const rideDurationHours = rideDistanceMiles / rideSpeedMph;
 const feedIntervalMinutes = 45;
 const buffer = 1.0;
 
+const z1s = 44 * 60 + 1;
+const z2s = 18 * 60 + 2;
+const z3s = 10 * 60 + 28;
+const z4s = 7 * 60 + 30;
+const z5s = 5 * 60 + 37
+const z6s = 7 * 60 + 39;
+const z7s = 5 * 60 + 23;
+
+const ftp = 215;
+
+const z1if = ((55 + 0) / 2) / 100;
+const z2if = ((56 + 75) / 2) / 100;
+const z3if = ((76 + 90) / 2) / 100;
+const z4if = ((91 + 105) / 2) / 100;
+const z5if = ((106 + 120) / 2) / 100;
+const z6if = ((121 + 150) / 2) / 100;
+const z7if = 200 / 100;
+
+const kj1 = ((z1if * ftp) * z1s) / 1000;
+const kj2 = ((z2if * ftp) * z2s) / 1000;
+const kj3 = ((z3if * ftp) * z3s) / 1000;
+const kj4 = ((z4if * ftp) * z4s) / 1000;
+const kj5 = ((z5if * ftp) * z5s) / 1000;
+const kj6 = ((z6if * ftp) * z6s) / 1000;
+const kj7 = ((z7if * ftp) * z7s) / 1000;
+
+const kj = kj1 + kj2 + kj3 + kj4 + kj5 + kj6 + kj7;
+
+console.log(`Total kilojoules: ${kj.toFixed(0)}`);
+
+const pct1 = computeRoughCarbBurnedPercentage(z1if);
+const pct2 = computeRoughCarbBurnedPercentage(z2if);
+const pct3 = computeRoughCarbBurnedPercentage(z3if);
+const pct4 = computeRoughCarbBurnedPercentage(z4if);
+const pct5 = computeRoughCarbBurnedPercentage(z5if);
+const pct6 = computeRoughCarbBurnedPercentage(z6if);
+const pct7 = computeRoughCarbBurnedPercentage(z7if);
+
+const cals1 = 9 / 7 * kj1;
+const cals2 = 9 / 7 * kj2;
+const cals3 = 9 / 7 * kj3;
+const cals4 = 9 / 7 * kj4;
+const cals5 = 9 / 7 * kj5;
+const cals6 = 9 / 7 * kj6;
+const cals7 = 9 / 7 * kj7;
+
+const cals = cals1 + cals2 + cals3 + cals4 + cals5 + cals6 + cals7;
+console.log(`Total calories: ${cals.toFixed(0)}`);
+
+const carbs = pct1 * cals1 + pct2 * cals2 + pct3 * cals3 + pct4 * cals4 + pct5 * cals5 + pct6 * cals6 + pct7 * cals7;
+const carbGrams = carbs / 4;
+console.log(`Total carbs: ${carbGrams.toFixed(0)}`);
 
 const foods = {
     gummies: {

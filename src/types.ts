@@ -14,6 +14,7 @@ export type TargetCategory = {
     maxMinutesTotal?: number;
     minIntervalRestMinutes?: number;
     continuousZone?: number;
+    minIntervalPercentage?: number;
 }
 
 export type CurrentIntervalProgression = {
@@ -35,6 +36,9 @@ export type TargetRideContinuous = {
     continuousZone: number;
     continuousWatts: number;
     totalMinutes: number;
+    calories: number;
+    fatCalories: number;
+    glycogenCalories: number;
 }
 
 export type TargetRideInterval = TargetRideContinuous & {
@@ -57,5 +61,7 @@ export type IntervalLength = {
     minMinutes: number;
     maxMinutes: number;
 }
+
+export type IntervalLengths = IntervalLength[];
 
 export type TargetCategoryWithProgression = TargetCategory & Partial<CurrentIntervalProgression>;

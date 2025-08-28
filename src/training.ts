@@ -2,8 +2,9 @@ import Decimal from "decimal.js";
 import { Temporal } from "temporal-polyfill";
 import { Activity } from "./intervals-transformers";
 import { addDays, getToday, lessThan, moreThanEqual } from "./days";
-import { CurrentIntervalProgression, CurrentIntervalProgressions, IntervalSimplified, PowerZone, TargetCategory, TargetCategoryWithProgression, TargetRide } from "./types";
+import { CurrentIntervalProgression, CurrentIntervalProgressions, IntervalLengths, IntervalSimplified, PowerZone, TargetCategory, TargetCategoryWithProgression, TargetRide } from "./types";
 import { CogganPowerZones, targetCategories } from "./training-definitions";
+import { ICUActivity } from "./intervals-api";
 
 export function computeFitness(
     fitnessYesterday: number,
@@ -134,23 +135,38 @@ export function formatMinutes(minutes: number): string {
 }
 
 export function printTargetRide(ride: TargetRide) {
+
+    const timePad = 7;
+    const powPad = 19;
+    const zPad = 4;
+    const dPad = 17;
+    const calPad = 19;
+    const fatPad = 19;
+    const carbPad = 18;
+
     if ('intervalZone' in ride) {
-        const rest = ride.intervalReps > 1 ? ` (rest ${formatMinutes(ride.restMinutes)})` : '';
+        const rest = ride.intervalReps > 1 ? ` (r${formatMinutes(ride.restMinutes)})` : '';
         const continuousMinutes = ride.totalMinutes - (ride.intervalReps * ride.intervalMinutes) - (ride.restMinutes * (ride.intervalReps - 1));
         return [
-            `${formatMinutes(ride.totalMinutes)}`,
-            `${ride.intervalReps}x${formatMinutes(ride.intervalMinutes)}@${Math.round(ride.intervalWatts)}w${rest}`,
-            `Z${Math.floor(ride.intervalZone)}`,
-            `${ride.name}`,
+            `${formatMinutes(ride.totalMinutes).padEnd(timePad)}`,
+            `${ride.intervalReps}x${formatMinutes(ride.intervalMinutes)}@${Math.round(ride.intervalWatts)}w${rest}`.padEnd(powPad),
+            `Z${Math.floor(ride.intervalZone)}`.padEnd(zPad),
+            `${ride.name}`.padEnd(dPad),
+            `${Math.round(ride.calories)} cal (${Math.round(ride.calories / ride.totalMinutes * 60)}/hr)`.padEnd(calPad),
+            `${Math.round(ride.fatCalories)} fat (${gramsToPounds(ride.fatCalories / 9).toFixed(2)}lb)`.padEnd(fatPad),
+            `${Math.round(ride.glycogenCalories)} carb (${Math.round(ride.glycogenCalories / 4)}g)`.padEnd(carbPad),
             `+${formatMinutes(continuousMinutes)}Z${Math.floor(ride.continuousZone)}@${Math.round(ride.continuousWatts)}w`,
-        ].join('|');
+        ].join('');
     } else {
         return [
-            `${formatMinutes(ride.totalMinutes)}`,
-            `${Math.round(ride.continuousWatts)}w`,
-            `Z${Math.floor(ride.continuousZone)}`,
-            `${ride.name}`
-        ].join('|');
+            `${formatMinutes(ride.totalMinutes).padEnd(timePad)}`,
+            `${Math.round(ride.continuousWatts)}w`.padEnd(powPad),
+            `Z${Math.floor(ride.continuousZone)}`.padEnd(zPad),
+            `${ride.name}`.padEnd(dPad),
+            `${Math.round(ride.calories)} cal (${Math.round(ride.calories / ride.totalMinutes * 60)}/hr)`.padEnd(calPad),
+            `${Math.round(ride.fatCalories)} fat (${gramsToPounds(ride.fatCalories / 9).toFixed(2)}lb)`.padEnd(fatPad),
+            `${Math.round(ride.glycogenCalories)} carb (${Math.round(ride.glycogenCalories / 4)}g)`.padEnd(carbPad),
+        ].join('');
     }
 }
 
@@ -252,6 +268,30 @@ function calculateHoursForTargetRide(
             return null;
         }
 
+        if(category.minIntervalPercentage) {
+            const min = totalMinutes - 20; // warmup + cooldown;
+            const percent = (totalIntervalMinutes + totalIntervalRestMinutes) / min * 100;
+            if(percent < category.minIntervalPercentage) {
+                console.log(`min: ${min}, interval: ${totalIntervalMinutes}`);
+                console.log(`Interval percentage ${percent.toFixed(1)}% is less than minimum ${category.minIntervalPercentage}%`);
+                return null;
+            }
+        }
+
+        const intervalCalories = computeCalories(intervalWatts, totalIntervalMinutes);
+        const restCalories = computeCalories(continuousWatts, totalIntervalRestMinutes);
+        const continuousCalories = computeCalories(continuousWatts, remainingMinutes);
+        const intervalFatCalories = computeRoughFatBurnedPercentage(intervalWatts / ftp) * intervalCalories;
+        const restFatCalories = computeRoughFatBurnedPercentage(continuousWatts / ftp) * restCalories;
+        const continuousFatCalories = computeRoughFatBurnedPercentage(continuousWatts / ftp) * continuousCalories;
+        const intervalGlycogenCalories = intervalCalories - intervalFatCalories;
+        const restGlycogenCalories = restCalories - restFatCalories;
+        const continuousGlycogenCalories = continuousCalories - continuousFatCalories;
+
+        const calories = intervalCalories + restCalories + continuousCalories;
+        const fatCalories = intervalFatCalories + restFatCalories + continuousFatCalories;
+        const glycogenCalories = intervalGlycogenCalories + restGlycogenCalories + continuousGlycogenCalories;
+
         const ride = {
             name: category.name,
             zone: category.zone,
@@ -262,7 +302,10 @@ function calculateHoursForTargetRide(
             intervalMinutes,
             intervalWatts,
             intervalZone: category.zone,
-            restMinutes: category.minIntervalRestMinutes
+            restMinutes: category.minIntervalRestMinutes,
+            calories,
+            fatCalories,
+            glycogenCalories
         }
 
         // const normalizedPower = computeNormalizedPowerForIntervals(ride);
@@ -282,16 +325,34 @@ function calculateHoursForTargetRide(
         return null;
     }
 
+    const continuousWatts = category.percentFtp / 100 * ftp;
+    const calories = computeCalories(continuousWatts, totalMinutes);
+    const fatCalories = computeRoughFatBurnedPercentage(continuousWatts / ftp) * calories;
+    const glycogenCalories = calories - fatCalories;
+
     return {
         name: category.name,
         zone: category.zone,
         continuousZone: category.zone,
-        continuousWatts: category.percentFtp / 100 * ftp,
-        totalMinutes
+        continuousWatts,
+        totalMinutes,
+        calories,
+        fatCalories,
+        glycogenCalories
     };
 }
 
-type Zones = ReturnType<typeof calculateCogganPowerZones>;
+export function computeCalories(watts: number, durationMinutes: number): number {
+    const kJPerMin = (watts * 3.6) / 60;
+    const kJ = kJPerMin * durationMinutes;
+
+    // 9/7ths is a rough estimate of the conversion from kJ to kcal. This figure varies
+    // from person to person, we might want to make it configurable in the future.
+    const kCal = kJ * (9.0 / 7.0);
+    return kCal;
+}
+
+export type Zones = ReturnType<typeof calculateCogganPowerZones>;
 
 export const zonesToStrings = (zones: Zones) => {
     return Object.fromEntries(Object.entries(zones).map(([key, [min, max]]) => {
@@ -322,9 +383,58 @@ export const getZoneNumberForPower = (power: number, zones: Zones) => {
     throw new Error(`Power ${power} W does not fit in any zone.`);
 }
 
-export const getZoneForRide = (ftp: number, np: number): number => {
-    const zones = calculateCogganPowerZones(ftp);
-    return getZoneNumberForPower(np, zones);
+export const parseInterval = (interval: string) => {
+    const regex = /(?<reps>\d)x (?:(?<h>\d+)h)?(?:(?<m>\d+)m)?(?:(?<s>\d+)s)? (?<watts>\d+)w/gi;
+
+    const match = regex.exec(interval);
+    if (!match) throw new Error(`Invalid interval format: ${interval}`);
+
+    const reps = parseInt(match.groups?.reps ?? '1');
+    const hours = parseInt(match.groups?.h ?? '0');
+    const minutes = parseInt(match.groups?.m ?? '0');
+    const seconds = parseInt(match.groups?.s ?? '0');
+    const watts = parseInt(match.groups?.watts ?? '0');
+
+    return { reps, durationMinutes: hours * 60 + minutes + seconds / 60, watts };
+}
+
+export const getZoneForRide = (
+    ride: ICUActivity,
+    zones: Zones,
+    intervalLengths: IntervalLengths
+): number => {
+    const np = ride.icu_weighted_avg_watts;
+
+    const intervals = (ride.interval_summary ?? [])
+        .map(parseInterval)
+        .map(({ reps, durationMinutes, watts }) => ({ reps, durationMinutes, zone: getZoneNumberForPower(watts, zones) }))
+        .map(i => ({ ...i, lengthCategory: intervalLengths.find(length => length.zone === i.zone && i.durationMinutes >= length.minMinutes && i.durationMinutes <= length.maxMinutes) }))
+        .filter(i => i.lengthCategory)
+        .reduce((prev: { zone: number, reps: number, durationMinutes: number }[], curr) => {
+            let info = prev.find(x => x.zone == curr.zone);
+            if (!info) {
+                info = { zone: curr.zone, reps: curr.reps, durationMinutes: curr.durationMinutes };
+                prev.push(info);
+            }
+            else {
+                info.reps += curr.reps;
+                info.durationMinutes = Math.min(info.durationMinutes, curr.durationMinutes);
+            }
+            return prev;
+        }, [])
+        .map(i => ({ ...i, score: Math.pow(i.zone, i.reps) }))
+        .sort((a, b) => b.score - a.score);
+
+    if (intervals.length == 0) {
+        return getZoneNumberForPower(np, zones);
+    }
+
+    // console.log(`Ride on ${ride.start_date_local.split('T')[0]}: NP ${np}w`);
+    // for (const interval of intervals) {
+    //     console.log(`Interval: ${interval.reps}x${formatMinutes(interval.durationMinutes)}@${interval.zone}`);
+    // }
+
+    return intervals[0].zone;
 }
 
 export function powerAtDurationPowerLaw(
@@ -567,4 +677,8 @@ export function computeRoughCarbBurnedPercentage(
     intensityFactor: number
 ): number {
     return 1 - computeRoughFatBurnedPercentage(intensityFactor);
+}
+
+export function gramsToPounds(grams: number): number {
+    return grams / 453.59237;
 }
