@@ -1,12 +1,13 @@
 import 'dotenv-json2/config';
-import fs from 'fs';
-import { getRides, getWellness } from './intervals-api';
+import { getRides, getWellness, ICUActivity } from './intervals-api';
 import { Activity, pruneActivityFields, pruneWellnessFields } from './intervals-transformers';
 import { addDays, getToday } from './days';
 import { Temporal } from 'temporal-polyfill';
-import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, ScheduleRecord, setSchedule } from './schedule';
+import { computeScheduleFromRides, computeTrainingLoads, getDayOfWeek, SchedulePreference, ScheduleRecord, setSchedule } from './schedule';
 import { calculateCogganPowerZones, getPeakSevenDayTSS, printTargetRide, zonesToStrings } from './training';
 import { CurrentIntervalProgressions } from './types';
+import fs from 'fs';
+import { intervalLengths } from './training-definitions';
 
 const willRideToday = true;
 const daysToAdd = 10;
@@ -20,29 +21,35 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
     { zone: 5, progression: [2, 3] },       // VO2 max
 ];
 
-function setSchedules(schedules: ScheduleRecord[]) {
-
-    setSchedule(schedules, { date: '2025-08-25', targetFormPercent: -14 });               // Monday
-    setSchedule(schedules, { date: '2025-08-26', targetFormPercent: -12 });               // Tuesday
-    setSchedule(schedules, { date: '2025-08-27', targetFormPercent: -10 });               // Wednesday
-    setSchedule(schedules, { date: '2025-08-28', targetTomorrowFormPercent: 10 });        // Thursday
-    setSchedule(schedules, { date: '2025-08-29', targetTrainingLoad: 10 });                // Friday Recovery Bike?
-    setSchedule(schedules, { date: '2025-08-30', targetTrainingLoad: 270 });                // Saturday Hike?
-    setSchedule(schedules, { date: '2025-08-31', targetTrainingLoad: 0 });              // Sunday METRIC!!
-    setSchedule(schedules, { date: '2025-09-01', targetFormPercent: -20 });               // Monday
-    setSchedule(schedules, { date: '2025-09-02', targetFormPercent: -20 });               // Tuesday
-    setSchedule(schedules, { date: '2025-09-03', targetFormPercent: -20 });               // Wednesday
-    setSchedule(schedules, { date: '2025-09-04', targetFormPercent: -20 });        // Thursday
+function setSchedules(set: SetSchedule) {
+    set({ date: '2025-08-26', targetFormPercent: -15 });               // Tuesday
+    set({ date: '2025-08-27', targetTrainingLoad: 10 });               // Wednesday
+    set({ date: '2025-08-28', targetTomorrowFormPercent: 10 });        // Thursday
+    set({ date: '2025-08-29', targetTrainingLoad: 10 });               // Friday - Recovery Bike?
+    set({ date: '2025-08-30', targetTrainingLoad: 270 });              // Saturday
+    set({ date: '2025-08-31', targetTrainingLoad: 0 });                // Sunday - hike?
+    set({ date: '2025-09-01', targetFormPercent: -15 });               // Monday
+    set({ date: '2025-09-02', targetFormPercent: -15 });               // Tuesday
+    set({ date: '2025-09-03', targetFormPercent: -15 });               // Wednesday
+    set({ date: '2025-09-04', targetFormPercent: -15 });               // Thursday
+    set({ date: '2025-09-05', targetFormPercent: -15 });               // Friday
 }
+
+type SetSchedule = (pref: SchedulePreference) => void;
 
 async function go() {
 
     console.log('Fetching rides from Intervals.icu...');
     const rawRides = await getRides(seasonStart);
-    const rides = rawRides.map(pruneActivityFields);
+
+    const currentFtp = rawRides[0].icu_ftp;
+    const powerZones = calculateCogganPowerZones(currentFtp);
+    const prune = (record: ICUActivity) => pruneActivityFields(record, powerZones, intervalLengths);
+
+    const rides = rawRides.map(prune);
     const wellness = (await getWellness()).map(pruneWellnessFields);;
 
-    // fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
+    fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
     // const outputFile = './activities.json';
     // const activities = JSON.stringify(rides);
     // fs.writeFileSync(outputFile, activities);
@@ -59,7 +66,6 @@ async function go() {
     const startDate = startDT.toString();
     const endDate = endDT.toString();
 
-    const powerZones = calculateCogganPowerZones(rides[0].currentFtp);
     const zoneStrs = zonesToStrings(powerZones);
     console.log('------------------------------------------------------------------------');
     console.log('Power Zones:');
@@ -84,7 +90,8 @@ async function go() {
         daysToAdd
     );
 
-    setSchedules(schedules);
+    const set = (pref: SchedulePreference) => setSchedule(schedules, pref);
+    setSchedules(set);
 
     computeTrainingLoads(schedules, rides[0].currentFtp, currentIntervalProgressions);
 

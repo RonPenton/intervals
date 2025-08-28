@@ -53,14 +53,14 @@ export type ScheduleFields = {
 
 export type ScheduleRecord = ScheduleId & ScheduleDate & ScheduleFields;
 
-export type SchdulePreference = (ScheduleId | ScheduleDate) & ScheduleFields;
+export type SchedulePreference = (ScheduleId | ScheduleDate) & ScheduleFields;
 
 export type Schedule = ScheduleRecord[];
 
 
 export function setSchedule(
     schedule: Schedule,
-    preference: SchdulePreference
+    preference: SchedulePreference
 ) {
 
     const record = 'offset' in preference

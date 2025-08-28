@@ -98,19 +98,21 @@ async function go() {
     console.log(`Target ride zone: ${zone}`);
     console.log(`Target ride time: ${rideDurationHours.toFixed(1)} hours`);
 
-
     const totalCarbs = adjustedCarbGramsPerHour * rideDurationHours;
     console.log(`Estimated total carbs needed: ${totalCarbs.toFixed(0)} grams`);
 
     const carbsPerPeriod = feedIntervalMinutes / 60 * adjustedCarbGramsPerHour;
+    const totalCarbCalories = totalCarbs * 4;
+    console.log(`Estimated total calories burned from Glycogen: ${totalCarbCalories.toFixed(0)} calories`);
+
     console.log(`Estimated carbs needed per feeding period: ${carbsPerPeriod.toFixed(0)} grams`);
 
     console.log(`Chosen food: ${chosenFood}`);
     const carbsPerUnit = foods[chosenFood].servingCarbGrams / foods[chosenFood].unitsPerServing;
     console.log(`Carbs per unit: ${carbsPerUnit.toFixed(1)} grams`);
 
-    const numberPerPeriod = carbsPerPeriod / carbsPerUnit;
-    console.log(`Number of ${chosenFood} per ${feedIntervalMinutes} minutes: ${Math.round(numberPerPeriod)}`);
+    const numberPerPeriod = Math.round(carbsPerPeriod / carbsPerUnit);
+    console.log(`Number of ${chosenFood} per ${feedIntervalMinutes} minutes: ${numberPerPeriod}`);
 
     const servingsPerPeriod = carbsPerPeriod / foods[chosenFood].servingCarbGrams;
     const gramsPerPeriod = servingsPerPeriod * foods[chosenFood].gramsPerServing;
@@ -119,11 +121,11 @@ async function go() {
     const caloriesPerHour = adjustedCarbGramsPerHour * 4;
     console.log(`Calorie consumption per hour: ${caloriesPerHour.toFixed(0)} calories`);
 
-    const feedsPerRide = rideDurationHours / (feedIntervalMinutes / 60);
-    console.log(`Estimated number of feeds for the ride: ${Math.round(feedsPerRide)}`);
+    const feedsPerRide = Math.floor(rideDurationHours / (feedIntervalMinutes / 60));
+    console.log(`Estimated number of feeds for the ride: ${feedsPerRide}`);
 
-    const totalUnitsToPack = Math.round(feedsPerRide) * Math.round(numberPerPeriod);
-    console.log(`Total ${chosenFood} to pack: ${totalUnitsToPack.toFixed(0)} (${feedsPerRide.toFixed(0)} x ${numberPerPeriod.toFixed(0)})`);
+    const totalUnitsToPack = feedsPerRide * numberPerPeriod;
+    console.log(`Total ${chosenFood} to pack: ${totalUnitsToPack.toFixed(0)} (${feedsPerRide} x ${numberPerPeriod})`);
 
     const servingsPerContainer = foods[chosenFood].gramsPerContainer / foods[chosenFood].gramsPerServing;
     console.log(`Servings per container: ${servingsPerContainer.toFixed(1)}`);
