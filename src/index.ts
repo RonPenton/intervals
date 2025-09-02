@@ -21,14 +21,13 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
     { zone: 3.5, progression: [3, 20] },     // tempo intervals
     { zone: 3.6, progression: [2, 15] },     // sweet spot
     { zone: 4, progression: [1, 16] },       // threshold
-    { zone: 5, progression: [4, 4] },       // VO2 max
+    { zone: 5, progression: [4, 5] },       // VO2 max
     { zone: 6, progression: [2, 0.5] }        // anaerobic
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-09-02', targetFormPercent: -8 });               // Tuesday
-    set({ date: '2025-09-03', targetFormPercent: -10 });              // Wednesday
-    set({ date: '2025-09-04', targetFormPercent: -3 });               // Thursday
+    set({ date: '2025-09-03', targetFormPercent: -14 });              // Wednesday
+    set({ date: '2025-09-04', targetFormPercent: -5 });               // Thursday
     set({ date: '2025-09-05', targetFormPercent: -7 });               // Friday
     set({ date: '2025-09-06', targetFitness: 72 });                   // Saturday
     set({ date: '2025-09-07', targetTrainingLoad: 10 });              // Sunday
