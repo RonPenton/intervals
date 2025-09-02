@@ -35,7 +35,7 @@ export const targetCategories: TargetCategory[] = [
     { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutesInZone: 120 },
     { name: "Endurance", zone: 2.6, percentFtp: 73, minMinutesInZone: 40, maxMinutesInZone: 120 },
     { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 120 },
-    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
+    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2.6, maxMinutesTotal: 150, minIntervalRestMinutes: 10 },
     { name: "Sweet Spot", zone: 3.6, percentFtp: 91, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
     { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 4, minIntervalPercentage: 30 },
     { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 3, maxMinutesInZone: 24, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 3, minIntervalPercentage: 30 },

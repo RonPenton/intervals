@@ -21,22 +21,22 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
     { zone: 3.5, progression: [3, 20] },     // tempo intervals
     { zone: 3.6, progression: [2, 15] },     // sweet spot
     { zone: 4, progression: [1, 16] },       // threshold
-    { zone: 5, progression: [3, 4] },       // VO2 max
+    { zone: 5, progression: [4, 4] },       // VO2 max
     { zone: 6, progression: [2, 0.5] }        // anaerobic
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-08-27', targetTrainingLoad: 10 });               // Wednesday
-    set({ date: '2025-08-28', targetTomorrowFormPercent: 10 });        // Thursday
-    set({ date: '2025-08-29', targetTrainingLoad: 10 });               // Friday - Recovery Bike?
-    set({ date: '2025-08-30', targetTrainingLoad: 270 });              // Saturday
-    set({ date: '2025-08-31', targetTrainingLoad: 60 });                // Sunday - hike?
-    set({ date: '2025-09-01', targetFormPercent: -15 });               // Monday
-    set({ date: '2025-09-02', targetFormPercent: -16 });               // Tuesday
-    set({ date: '2025-09-03', targetFormPercent: -17 });               // Wednesday
-    set({ date: '2025-09-04', targetFormPercent: -10 });               // Thursday
-    set({ date: '2025-09-05', targetFormPercent: -12 });               // Friday
-    set({ date: '2025-09-06', targetFitness: 75 });              // Saturday
+    set({ date: '2025-09-02', targetFormPercent: -8 });               // Tuesday
+    set({ date: '2025-09-03', targetFormPercent: -10 });              // Wednesday
+    set({ date: '2025-09-04', targetFormPercent: -3 });               // Thursday
+    set({ date: '2025-09-05', targetFormPercent: -7 });               // Friday
+    set({ date: '2025-09-06', targetFitness: 72 });                   // Saturday
+    set({ date: '2025-09-07', targetTrainingLoad: 10 });              // Sunday
+    set({ date: '2025-09-08', targetFormPercent: -10 });              // Monday
+    set({ date: '2025-09-09', targetFormPercent: -15 });              // Tuesday
+    set({ date: '2025-09-10', targetFormPercent: -15 });              // Wednesday
+    set({ date: '2025-09-11', targetFormPercent: -15 });              // Thursday
+    set({ date: '2025-09-12', targetFormPercent: -15 });              // Friday
 }
 
 type SetSchedule = (pref: SchedulePreference) => void;
