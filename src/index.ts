@@ -26,7 +26,7 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-09-03', targetFormPercent: -14 });              // Wednesday
+    set({ date: '2025-09-03', targetFormPercent: -15 });              // Wednesday
     set({ date: '2025-09-04', targetFormPercent: -5 });               // Thursday
     set({ date: '2025-09-05', targetFormPercent: -7 });               // Friday
     set({ date: '2025-09-06', targetFitness: 72 });                   // Saturday
