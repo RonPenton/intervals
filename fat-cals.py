@@ -49,14 +49,24 @@ calories_per_tss = total_kcal / tss
 max_idx = int(np.argmax(fat_kcal))
 max_power = powers[max_idx]
 max_fat_kcal = fat_kcal[max_idx]
+m_carb_kcal = carb_kcal[max_idx]
 print(f"Max fat calories/hour ≈ {max_fat_kcal:.1f} kcal/h at {max_power:.0f} W "
       f"(IF={max_power/FTP:.2f})")
+print(f"carb calories/hour at fatmax ≈ {m_carb_kcal:.1f} kcal/h at {max_power:.0f} W "
+      f"(IF={max_power/FTP:.2f})")
+
+fat20 = fat_kcal[max_idx + 20]
+carb20 = carb_kcal[max_idx + 20]
+cal20 = fat20 + carb20
+print(f"Fat calories/hour at fatmax+20W ≈ {fat20:.1f} kcal/h at {max_power+20:.0f} W ")
+print(f"carb calories/hour at fatmax+20W ≈ {carb20:.1f} kcal/h at {max_power+20:.0f} W ")
+print(f"Total calories/hour at fatmax+20W ≈ {cal20:.1f} kcal/h at {max_power+20:.0f} W ")
 
 plt.figure()
 plt.plot(powers, fat_kcal)
 plt.plot(powers, carb_kcal)
 plt.plot(powers, total_kcal, linestyle='dashed')
-plt.plot(powers, tss, linestyle='dotted')
+# plt.plot(powers, tss, linestyle='dotted')
 # plt.plot(powers, calories_per_tss, linestyle='dashdot')
 plt.xlabel("Power (W)")
 plt.ylabel("Fat calories burned per hour (kcal/h)")

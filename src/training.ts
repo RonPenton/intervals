@@ -272,8 +272,8 @@ function calculateHoursForTargetRide(
             const min = totalMinutes - 20; // warmup + cooldown;
             const percent = (totalIntervalMinutes + totalIntervalRestMinutes) / min * 100;
             if(percent < category.minIntervalPercentage) {
-                console.log(`min: ${min}, interval: ${totalIntervalMinutes}`);
-                console.log(`Interval percentage ${percent.toFixed(1)}% is less than minimum ${category.minIntervalPercentage}%`);
+                // console.log(`min: ${min}, interval: ${totalIntervalMinutes}`);
+                // console.log(`Interval percentage ${percent.toFixed(1)}% is less than minimum ${category.minIntervalPercentage}%`);
                 return null;
             }
         }

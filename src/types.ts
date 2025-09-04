@@ -65,3 +65,10 @@ export type IntervalLength = {
 export type IntervalLengths = IntervalLength[];
 
 export type TargetCategoryWithProgression = TargetCategory & Partial<CurrentIntervalProgression>;
+
+export type Athlete = {
+    ftp: number;
+    intervalProgressions: CurrentIntervalProgressions;
+    warmupMinutes: number;
+    cooldownMinutes: number;
+}
