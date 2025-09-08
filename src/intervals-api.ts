@@ -88,6 +88,72 @@ export async function getWellness(
     return data;
 }
 
+export async function getWellnessOnDate(
+    date: string,
+    athleteId = '0'
+) {
+    const path = '/api/v1/athlete/{id}/wellness/{date}';
+
+    type Get = paths[typeof path]['get'];
+
+    const p = path.replace('{date}', date).replace('{id}', athleteId);
+    const url = `https://intervals.icu${p}`;
+
+    // Auth is BASIC auth
+    const auth = `Basic ${Buffer.from(`API_KEY:${process.env.INTERVALS_API_KEY}`).toString('base64')}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        console.error('Error fetching activities:', responseText);
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json() as ICUWellness;
+    return data;
+}
+
+export async function setWellnessOnDate(
+    date: string,
+    wellness: ICUWellness,
+    athleteId = '0'
+) {
+    const path = '/api/v1/athlete/{id}/wellness/{date}';
+
+    type Put = paths[typeof path]['put'];
+
+    const p = path.replace('{date}', date).replace('{id}', athleteId);
+    const url = `https://intervals.icu${p}`;
+
+    // Auth is BASIC auth
+    const auth = `Basic ${Buffer.from(`API_KEY:${process.env.INTERVALS_API_KEY}`).toString('base64')}`;
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(wellness)
+    });
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        console.error('Error fetching activities:', responseText);
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json() as ICUWellness;
+    return data;
+}
+
 export async function getPowerCurve(
     athleteId = '0'
 ): Promise<ICUPowerCurve> {

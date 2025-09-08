@@ -20,21 +20,21 @@ const tssMultiplier = 1.05;
 const currentIntervalProgressions: CurrentIntervalProgressions = [
     { zone: 3.5, progression: [2, 30] },     // tempo intervals
     { zone: 3.6, progression: [3, 15] },     // sweet spot
-    { zone: 4, progression: [3, 10] },       // threshold
+    { zone: 4, progression: [4, 10] },       // threshold
     { zone: 5, progression: [4, 5] },       // VO2 max
     { zone: 6, progression: [2, 0.5] }        // anaerobic
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-09-04', targetFormPercent: -17, maxZone: 3 });               // Thursday
-    set({ date: '2025-09-05', targetFormPercent: -18, maxZone: 3 });               // Friday
-    set({ date: '2025-09-06', targetFormPercent: -22, maxZone: 3 });               // Saturday
-    set({ date: '2025-09-07', targetTrainingLoad: 10 });              // Sunday
-    set({ date: '2025-09-08', targetFormPercent: -10 });              // Monday
-    set({ date: '2025-09-09', targetFormPercent: -13 });              // Tuesday
-    set({ date: '2025-09-10', targetFormPercent: -15 });              // Wednesday
-    set({ date: '2025-09-11', targetFormPercent: -15 });              // Thursday
+    set({ date: '2025-09-08', targetFormPercent: -24, maxZone: 2 });              // Monday
+    set({ date: '2025-09-09', targetFormPercent: -21, maxZone: 3 });              // Tuesday
+    set({ date: '2025-09-10', targetFormPercent: -25, minZone: 4, maxZone: 4 });              // Wednesday
+    set({ date: '2025-09-11', targetTrainingLoad: 70, maxZone: 2 });              // Thursday
     set({ date: '2025-09-12', targetFormPercent: -15 });              // Friday
+    set({ date: '2025-09-13', targetFormPercent: -15 });              // Saturday
+    set({ date: '2025-09-14', targetFormPercent: -15 });              // Sunday
+    set({ date: '2025-09-15', targetFormPercent: -15 });              // Monday
+    set({ date: '2025-09-16', targetFormPercent: -15 });              // Tuesday
 }
 
 type SetSchedule = (pref: SchedulePreference) => void;
