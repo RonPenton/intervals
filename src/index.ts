@@ -18,23 +18,26 @@ const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 const tssMultiplier = 1.05;
 
 const currentIntervalProgressions: CurrentIntervalProgressions = [
+    { zone: 3.2, progression: [6, 20] },    // long ride + tempo
     { zone: 3.5, progression: [2, 30] },     // tempo intervals
     { zone: 3.6, progression: [3, 15] },     // sweet spot
-    { zone: 4, progression: [4, 10] },       // threshold
+    { zone: 4, progression: [3, 12] },       // threshold
     { zone: 5, progression: [4, 5] },       // VO2 max
     { zone: 6, progression: [2, 0.5] }        // anaerobic
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-09-08', targetFormPercent: -24, maxZone: 2 });              // Monday
-    set({ date: '2025-09-09', targetFormPercent: -21, maxZone: 3 });              // Tuesday
-    set({ date: '2025-09-10', targetFormPercent: -25, minZone: 4, maxZone: 4 });              // Wednesday
-    set({ date: '2025-09-11', targetTrainingLoad: 70, maxZone: 2 });              // Thursday
-    set({ date: '2025-09-12', targetFormPercent: -15 });              // Friday
-    set({ date: '2025-09-13', targetFormPercent: -15 });              // Saturday
-    set({ date: '2025-09-14', targetFormPercent: -15 });              // Sunday
-    set({ date: '2025-09-15', targetFormPercent: -15 });              // Monday
+    set({ date: '2025-09-11', targetTrainingLoad: 50, maxZone: 2 });              // Thursday
+    set({ date: '2025-09-12', targetFormPercent: -20, maxZone: 3.9 });              // Friday
+    set({ date: '2025-09-13', targetTrainingLoad: 20, maxZone: 2 });              // Saturday
+    set({ date: '2025-09-14', targetTrainingLoad: 200 });              // Sunday
+    set({ date: '2025-09-15', targetFormPercent: -20 });              // Monday
     set({ date: '2025-09-16', targetFormPercent: -15 });              // Tuesday
+    set({ date: '2025-09-17', targetFormPercent: -15 });              // Wednesday
+    set({ date: '2025-09-18', targetFormPercent: -15 });              // Thursday
+    set({ date: '2025-09-19', targetFormPercent: -15 });              // Friday
+    set({ date: '2025-09-20', targetFormPercent: -15 });              // Saturday
+    set({ date: '2025-09-21', targetFormPercent: -15 });              // Sunday
 }
 
 type SetSchedule = (pref: SchedulePreference) => void;
@@ -70,7 +73,7 @@ async function go() {
 
     const zoneStrs = zonesToStrings(powerZones);
     console.log('------------------------------------------------------------------------');
-    console.log('Power Zones:');
+    console.log(`Power Zones for FTP ${currentFtp}W:`);
     Object.entries(zoneStrs).forEach(([name, range]) => console.log(`- ${name}: ${range}`));
     console.log('------------------------------------------------------------------------');
 

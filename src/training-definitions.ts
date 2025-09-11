@@ -29,29 +29,31 @@ export const CogganPowerZones: PowerZone[] = [
 ];
 
 export const targetCategories: TargetCategory[] = [
-    { name: "Stroll", zone: 1.1, percentFtp: 30, minMinutesInZone: 1, maxMinutesInZone: 90 },
+    { name: "Stroll", zone: 1.1, percentFtp: 40, minMinutesInZone: 1, maxMinutesInZone: 180 },
     { name: "Recovery", zone: 1, percentFtp: 50, minMinutesInZone: 30, maxMinutesInZone: 90 },
-    { name: "Base Miles", zone: 2, percentFtp: 60, minMinutesInZone: 40, maxMinutesInZone: 120 },
-    { name: "Long Ride", zone: 2.5, percentFtp: 70, minMinutesInZone: 120 },
-    { name: "Endurance", zone: 2.6, percentFtp: 73, minMinutesInZone: 40, maxMinutesInZone: 120 },
+    { name: "Base Miles", zone: 2, percentFtp: 65, minMinutesInZone: 40, maxMinutesInZone: 120 },
+    { name: "Long Ride", zone: 2.5, percentFtp: 69, minMinutesInZone: 120 },
+    { name: "Endurance", zone: 2.6, percentFtp: 72, minMinutesInZone: 40, maxMinutesInZone: 120 },
     { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 120 },
-    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2.6, maxMinutesTotal: 150, minIntervalRestMinutes: 10 },
-    { name: "Sweet Spot", zone: 3.6, percentFtp: 91, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
-    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 4, minIntervalPercentage: 40 },
-    { name: "VO2 Max", zone: 5, percentFtp: 112, minMinutesInZone: 3, maxMinutesInZone: 24, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 3, minIntervalPercentage: 40 },
-    { name: "Anaerobic", zone: 6, percentFtp: 135, minMinutesInZone: 0.5, maxMinutesInZone: 3, continuousZone: 2.6, maxMinutesTotal: 135, minIntervalRestMinutes: 1, minIntervalPercentage: 5 },
+    { name: "Long Ride+Tempo", zone: 3.2, percentFtp: 80, minMinutesInZone: 20, maxMinutesInZone: 180, continuousZone: 2.5, minIntervalRestMinutes: 10 },
+    { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 150, minIntervalRestMinutes: 10 },
+    { name: "Sweet Spot", zone: 3.6, percentFtp: 91, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
+    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 4, minIntervalPercentage: 40 },
+    { name: "VO2 Max", zone: 5, percentFtp: 120, minMinutesInZone: 3, maxMinutesInZone: 24, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 3, minIntervalPercentage: 40 },
+    { name: "Anaerobic", zone: 6, percentFtp: 135, minMinutesInZone: 0.5, maxMinutesInZone: 3, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 1, minIntervalPercentage: 5 },
 ];
 
 export const intervalProgressions: IntervalProgression[] = [
     { zone: 3.5, progressions: [[1, 20], [1, 30], [2, 20], [3, 20], [1, 45], [2, 30], [1, 60], [2, 45], [1, 90]] },
     { zone: 3.6, progressions: [[1, 10], [1, 15], [2, 10], [1, 20], [2, 15], [1, 30], [2, 20], [3, 15], [2, 25], [1, 50], [4, 15], [3, 20], [2, 30], [1, 60]] },
-    { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 8], [2, 12], [1, 24], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [3, 15], [2, 25], [1, 45]] },
+    { zone: 4, progressions: [[1, 8], [1, 12], [2, 8], [1, 16], [1, 20], [2, 10], [1, 20], [3, 8], [2, 12], [1, 24], [3, 10], [2, 15], [2, 20], [1, 30], [4, 10], [5, 10], [4, 12], [3, 15], [2, 25], [1, 45]] },
     { zone: 5, progressions: [[1, 3], [1, 5], [2, 3], [1, 6], [2, 4], [3, 3], [2, 5], [1, 8], [4, 3], [3, 4], [4, 4], [3, 5], [2, 8], [4, 5], [3, 6], [4, 6], [3, 8], [4, 8]] },
     { zone: 6, progressions: [[1, 0.5], [2, 0.5], [1, 1], [2, 1], [3, 0.5], [3, 1], [2, 2], [1, 3], [2, 3], [3, 3], [4, 3]] }
 ];
 
 export const intervalLengths: IntervalLengths = [
     { zone: 3, minMinutes: 10, maxMinutes: 90 },
+    { zone: 3.2, minMinutes: 20, maxMinutes: 180 },
     { zone: 3.5, minMinutes: 20, maxMinutes: 90 },
     { zone: 3.6, minMinutes: 10, maxMinutes: 60 },
     { zone: 4, minMinutes: 8, maxMinutes: 45 },

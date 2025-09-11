@@ -31,6 +31,35 @@ export function computeClimbingPower(
     return gravityPower + rollingPower + airPower;
 }
 
+export function computeClimbingGrade(
+    speedMph: number,
+    totalMassPounds: number,   // rider + bike mass
+    targetPowerWatts: number,
+    rollingResistance = 0.005, // good road
+    dragArea = 0.4,            // CdA (m²)
+    airDensity = 1.225         // kg/m³ at sea level
+): number {
+    const g = 9.81; // m/s²
+    const v = speedMph * 0.44704; // m/s
+    if (v <= 0) return NaN;
+
+    const m = poundsToKg(totalMassPounds);
+
+    // Rolling resistance power ~ Crr * N * v; for small grades N ≈ m*g
+    const P_roll = rollingResistance * m * g * v;
+
+    // Aerodynamic power
+    const P_aero = 0.5 * airDensity * dragArea * v * v * v;
+
+    // Power available to lift against gravity
+    const P_grav = targetPowerWatts - P_roll - P_aero;
+
+    // grade (decimal) = P_grav / (m*g*v)
+    const gradeDecimal = P_grav / (m * g * v);
+
+    return gradeDecimal * 100; // percent
+}
+
 function poundsToKg(pounds: number): number {
     return pounds * 0.45359;
 }
@@ -122,4 +151,8 @@ export function estimateClimbTimeFromPowerCurve(
             bound /= 2;
         }
     }
+}
+
+export function getMphFromGearInches(rpm: number, gearInches: number): number {
+    return rpm * gearInches * Math.PI / 1056;
 }

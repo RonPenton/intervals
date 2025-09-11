@@ -241,9 +241,11 @@ function calculateHoursForTargetRide(
 
         // not sure when this would happen. 
         if (category.maxMinutesInZone && totalIntervalMinutes > category.maxMinutesInZone) {
+            //console.log(`Total interval minutes ${totalIntervalMinutes} exceeds max for ${category.name} ${category.maxMinutesInZone}`);
             return null;
         }
         if (category.minMinutesInZone && totalIntervalMinutes < category.minMinutesInZone) {
+            //console.log(`Total interval minutes ${totalIntervalMinutes} less than min for ${category.name} ${category.minMinutesInZone}`);
             return null;
         }
 
@@ -255,7 +257,7 @@ function calculateHoursForTargetRide(
         const totalIntervalTSS = intervalTSS + intervalRestTSS;
 
         if (totalIntervalTSS > trainingLoadTarget) {
-            // console.log(`Total interval TSS ${totalIntervalTSS} exceeds target ${trainingLoadTarget}`);
+            //console.log(`Total interval TSS ${totalIntervalTSS} exceeds target ${category.name} ${trainingLoadTarget}`);
             return null; // Not enough TSS for this ride
         }
 
@@ -265,15 +267,16 @@ function calculateHoursForTargetRide(
         const totalMinutes = Math.round(totalIntervalMinutes + totalIntervalRestMinutes + remainingMinutes);
 
         if (category.maxMinutesTotal && totalMinutes > category.maxMinutesTotal) {
+            //console.log(`Total minutes ${totalMinutes} exceeds max for ${category.name} ${category.maxMinutesTotal}`);
             return null;
         }
 
-        if(category.minIntervalPercentage) {
+        if (category.minIntervalPercentage) {
             const min = totalMinutes - 20; // warmup + cooldown;
             const percent = (totalIntervalMinutes + totalIntervalRestMinutes) / min * 100;
-            if(percent < category.minIntervalPercentage) {
+            if (percent < category.minIntervalPercentage) {
                 // console.log(`min: ${min}, interval: ${totalIntervalMinutes}`);
-                // console.log(`Interval percentage ${percent.toFixed(1)}% is less than minimum ${category.minIntervalPercentage}%`);
+                // console.log(`Interval percentage ${percent.toFixed(1)}% is less than minimum for ${category.name} ${category.minIntervalPercentage}%`);
                 return null;
             }
         }
