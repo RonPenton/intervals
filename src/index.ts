@@ -10,7 +10,7 @@ import fs from 'fs';
 import { intervalLengths } from './training-definitions';
 
 const willRideToday = true;
-const daysToAdd = 10;
+const daysToAdd = 7;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 
 // Garmin and Intervals disagree on TSS calculations. Garmin is typically 5% more, so alter numbers by this
@@ -27,15 +27,16 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-09-13', targetTrainingLoad: 20, maxZone: 2 });              // Saturday
-    set({ date: '2025-09-14', targetTrainingLoad: 200 });              // Sunday
-    set({ date: '2025-09-15', targetFormPercent: -20 });              // Monday
-    set({ date: '2025-09-16', targetFormPercent: -15 });              // Tuesday
-    set({ date: '2025-09-17', targetFormPercent: -15 });              // Wednesday
-    set({ date: '2025-09-18', targetFormPercent: -15 });              // Thursday
-    set({ date: '2025-09-19', targetFormPercent: -15 });              // Friday
-    set({ date: '2025-09-20', targetFormPercent: -15 });              // Saturday
-    set({ date: '2025-09-21', targetFormPercent: -15 });              // Sunday
+    set({ date: '2025-09-17', targetTrainingLoad: 50 });              // Wednesday
+    set({ date: '2025-09-18', targetFormPercent: -6 });              // Thursday
+    set({ date: '2025-09-19', targetFormPercent: -6 });              // Friday
+    set({ date: '2025-09-20', targetTrainingLoad: 20 });              // Saturday
+    set({ date: '2025-09-21', targetFormPercent: 0 });              // Sunday
+    set({ date: '2025-09-22', targetTrainingLoad: 135, minZone: 3.6 });              // Monday
+    set({ date: '2025-09-23', targetFormPercent: -5 });              // Tuesday
+    set({ date: '2025-09-24', targetFormPercent: -7 });              // Wednesday
+    set({ date: '2025-09-25', targetFormPercent: -9 });              // Thursday
+    set({ date: '2025-09-26', targetFormPercent: -5 });              // Friday
 }
 
 type SetSchedule = (pref: SchedulePreference) => void;

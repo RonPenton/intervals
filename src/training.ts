@@ -101,17 +101,20 @@ export function computeTrainingLoad(
 }
 
 export function computeMinutesForTrainingLoad(
-    percentFtp: number,
-    ftp: number,
-    trainingLoadTarget: number
+    intensityFactor: number,
+    tss: number
 ) {
-    const np = percentFtp / 100 * ftp;
-    const np2 = Math.pow(np, 2);
-    const ftp2 = Math.pow(ftp, 2);
-    const hours = ((trainingLoadTarget / 100) * ftp2) / np2;
-    return hours * 60;
-}
+    // const np = percentFtp / 100 * ftp;
+    // const np2 = Math.pow(np, 2);
+    // const ftp2 = Math.pow(ftp, 2);
+    // const hours = ((trainingLoadTarget / 100) * ftp2) / np2;
+    // return hours * 60;
 
+    intensityFactor = intensityFactor / 100;
+    const seconds = (36 * tss) / (intensityFactor * intensityFactor);
+    const minutes = seconds / 60;
+    return minutes;
+}
 
 export const calculateCogganPowerZones = (ftp: number) => {
     return Object.fromEntries(
@@ -262,7 +265,7 @@ function calculateHoursForTargetRide(
         }
 
         const remainingTSS = trainingLoadTarget - totalIntervalTSS;
-        const remainingMinutes = computeMinutesForTrainingLoad(continuousTargetCategory.percentFtp, ftp, remainingTSS);
+        const remainingMinutes = computeMinutesForTrainingLoad(continuousTargetCategory.percentFtp, remainingTSS);
 
         const totalMinutes = Math.round(totalIntervalMinutes + totalIntervalRestMinutes + remainingMinutes);
 
@@ -320,7 +323,7 @@ function calculateHoursForTargetRide(
         return ride;
     }
 
-    const totalMinutes = Math.round(computeMinutesForTrainingLoad(category.percentFtp, ftp, trainingLoadTarget));
+    const totalMinutes = Math.round(computeMinutesForTrainingLoad(category.percentFtp, trainingLoadTarget));
     if (category.minMinutesInZone && totalMinutes < category.minMinutesInZone) {
         return null;
     }

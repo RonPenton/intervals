@@ -37,8 +37,8 @@ export const targetCategories: TargetCategory[] = [
     { name: "Tempo", zone: 3, percentFtp: 80, minMinutesInZone: 30, maxMinutesInZone: 120 },
     { name: "Long Ride+Tempo", zone: 3.2, percentFtp: 80, minMinutesInZone: 20, maxMinutesInZone: 180, continuousZone: 2.5, minIntervalRestMinutes: 10 },
     { name: "Tempo Intervals", zone: 3.5, percentFtp: 85, minMinutesInZone: 20, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 150, minIntervalRestMinutes: 10 },
-    { name: "Sweet Spot", zone: 3.6, percentFtp: 91, minMinutesInZone: 10, maxMinutesInZone: 60, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 10 },
-    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 4, minIntervalPercentage: 40 },
+    { name: "Sweet Spot", zone: 3.6, percentFtp: 91, minMinutesInZone: 10, maxMinutesInZone: 90, continuousZone: 2, maxMinutesTotal: 150, minIntervalRestMinutes: 10 },
+    { name: "Threshold", zone: 4, percentFtp: 97, minMinutesInZone: 8, maxMinutesInZone: 50, continuousZone: 2, maxMinutesTotal: 150, minIntervalRestMinutes: 4, minIntervalPercentage: 40 },
     { name: "VO2 Max", zone: 5, percentFtp: 120, minMinutesInZone: 3, maxMinutesInZone: 24, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 3, minIntervalPercentage: 40 },
     { name: "Anaerobic", zone: 6, percentFtp: 135, minMinutesInZone: 0.5, maxMinutesInZone: 3, continuousZone: 2, maxMinutesTotal: 135, minIntervalRestMinutes: 1, minIntervalPercentage: 5 },
 ];

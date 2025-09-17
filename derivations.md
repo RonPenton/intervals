@@ -184,3 +184,41 @@ FatT = FatY + ------------
 7FatT = 7FatY + (TSS - FatY)
 7FatT = 6FatY + TSS
 TSS = 7FatT - 6FatY
+
+
+
+
+      seconds * NP * IF
+TSS = -------------------------  x 100
+              FTP * 3600
+
+
+TSS = 100 * seconds * NP * IF
+        -------------------------
+              FTP * 3600
+
+TSS = seconds * NP * IF
+       ----------------
+         FTP * 36
+
+
+TSS * FTP = seconds * NP * IF
+           ----------------
+               36
+
+TSS * FTP    seconds * IF
+--------   = =-----------
+   NP            36
+
+TSS *  (FTP/NP)  = (seconds * IF) / 36
+
+TSS * 1/IF = (seconds * IF) / 36
+
+TSS = (seconds * IF^2) / 36
+
+36 TSS = seconds * IF^2
+
+36 * TSS
+---------   = seconds
+   IF^2
+
