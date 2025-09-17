@@ -3,7 +3,7 @@ import { CogganPowerZones } from "./training-definitions";
 
 const targetFitness = 100;
 const zoneMix = [
-    30,      // zone 1
+    8,      // zone 1
     30,      // zone 2
     19,      // zone 3
     12,      // zone 4

@@ -10,7 +10,7 @@ import fs from 'fs';
 import { intervalLengths } from './training-definitions';
 
 const willRideToday = true;
-const daysToAdd = 7;
+const daysToAdd = 10;
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
 
 // Garmin and Intervals disagree on TSS calculations. Garmin is typically 5% more, so alter numbers by this
