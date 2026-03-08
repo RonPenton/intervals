@@ -1,0 +1,15 @@
+node_modules
+*.log
+.env.json
+.git
+.gitignore
+*.md
+*.py
+*.ts
+!*.d.ts
+activities.json
+raw-activities.json
+wellness.json
+temp.json
+nginx/
+docker-compose.yml
