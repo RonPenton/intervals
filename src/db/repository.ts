@@ -1,4 +1,5 @@
 import { query } from './connection';
+import { sql } from './sql-loader';
 import { Activity, Wellness } from '../intervals-transformers';
 import { ScheduleRecord } from '../schedule';
 
@@ -6,28 +7,7 @@ import { ScheduleRecord } from '../schedule';
 
 export async function upsertActivity(activity: Activity, rawJson?: object): Promise<void> {
     await query(
-        `INSERT INTO activities
-            (date, current_ftp, training_load, kj, normalized_watts,
-             miles, duration, hours, elevation, mph, calories,
-             temperature, intensity_factor, fatigue, fitness, zone, raw_json)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
-         ON CONFLICT (date) DO UPDATE SET
-            current_ftp      = EXCLUDED.current_ftp,
-            training_load    = EXCLUDED.training_load,
-            kj               = EXCLUDED.kj,
-            normalized_watts = EXCLUDED.normalized_watts,
-            miles            = EXCLUDED.miles,
-            duration         = EXCLUDED.duration,
-            hours            = EXCLUDED.hours,
-            elevation        = EXCLUDED.elevation,
-            mph              = EXCLUDED.mph,
-            calories         = EXCLUDED.calories,
-            temperature      = EXCLUDED.temperature,
-            intensity_factor = EXCLUDED.intensity_factor,
-            fatigue          = EXCLUDED.fatigue,
-            fitness          = EXCLUDED.fitness,
-            zone             = EXCLUDED.zone,
-            raw_json         = EXCLUDED.raw_json`,
+        sql('upsert-activity'),
         [
             activity.date, activity.currentFtp, activity.trainingLoad,
             activity.kj, activity.normalizedWatts, activity.miles,
@@ -47,8 +27,8 @@ export async function upsertActivities(activities: Activity[], rawActivities?: o
 
 export async function getActivities(oldest?: string): Promise<Activity[]> {
     const rows = oldest
-        ? await query('SELECT * FROM activities WHERE date >= $1 ORDER BY date DESC', [oldest])
-        : await query('SELECT * FROM activities ORDER BY date DESC');
+        ? await query(sql('get-activities-since'), [oldest])
+        : await query(sql('get-activities'));
 
     return rows.map(mapRowToActivity);
 }
@@ -78,16 +58,7 @@ function mapRowToActivity(row: any): Activity {
 
 export async function upsertWellness(w: Wellness, rawJson?: object): Promise<void> {
     await query(
-        `INSERT INTO wellness
-            (date, fitness, fatigue, fitness_load, fatigue_load, ramp_rate, raw_json)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)
-         ON CONFLICT (date) DO UPDATE SET
-            fitness      = EXCLUDED.fitness,
-            fatigue      = EXCLUDED.fatigue,
-            fitness_load = EXCLUDED.fitness_load,
-            fatigue_load = EXCLUDED.fatigue_load,
-            ramp_rate    = EXCLUDED.ramp_rate,
-            raw_json     = EXCLUDED.raw_json`,
+        sql('upsert-wellness'),
         [
             w.date, w.fitness, w.fatigue,
             w.fitnessLoad, w.fatigueLoad, w.rampRate,
@@ -104,8 +75,8 @@ export async function upsertWellnessBatch(records: Wellness[], rawRecords?: obje
 
 export async function getWellnessRecords(oldest?: string): Promise<Wellness[]> {
     const rows = oldest
-        ? await query('SELECT * FROM wellness WHERE date >= $1 ORDER BY date DESC', [oldest])
-        : await query('SELECT * FROM wellness ORDER BY date DESC');
+        ? await query(sql('get-wellness-since'), [oldest])
+        : await query(sql('get-wellness'));
 
     return rows.map(mapRowToWellness);
 }
@@ -125,20 +96,7 @@ function mapRowToWellness(row: any): Wellness {
 
 export async function upsertSchedule(s: ScheduleRecord): Promise<void> {
     await query(
-        `INSERT INTO schedules
-            (date, offset_days, fitness, fatigue, form, training_load,
-             needs_ride, zone, ride_options, meta)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-         ON CONFLICT (date) DO UPDATE SET
-            offset_days   = EXCLUDED.offset_days,
-            fitness       = EXCLUDED.fitness,
-            fatigue       = EXCLUDED.fatigue,
-            form          = EXCLUDED.form,
-            training_load = EXCLUDED.training_load,
-            needs_ride    = EXCLUDED.needs_ride,
-            zone          = EXCLUDED.zone,
-            ride_options  = EXCLUDED.ride_options,
-            meta          = EXCLUDED.meta`,
+        sql('upsert-schedule'),
         [
             s.date, s.offset, s.fitness ?? null, s.fatigue ?? null,
             s.form ?? null, s.trainingLoad ?? null,
@@ -157,8 +115,8 @@ export async function upsertSchedules(schedules: ScheduleRecord[]): Promise<void
 
 export async function getSchedules(oldest?: string): Promise<ScheduleRecord[]> {
     const rows = oldest
-        ? await query('SELECT * FROM schedules WHERE date >= $1 ORDER BY date ASC', [oldest])
-        : await query('SELECT * FROM schedules ORDER BY date ASC');
+        ? await query(sql('get-schedules-since'), [oldest])
+        : await query(sql('get-schedules'));
 
     return rows.map(mapRowToSchedule);
 }
