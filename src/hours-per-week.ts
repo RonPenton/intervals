@@ -1,15 +1,15 @@
 import { computeMinutesForTrainingLoad, computeTrainingLoad } from "./training";
 import { CogganPowerZones } from "./training-definitions";
 
-const targetFitness = 100;
+const targetFitness = 30;
 const zoneMix = [
     8,      // zone 1
-    30,      // zone 2
-    19,      // zone 3
-    12,      // zone 4
-    5,      // zone 5
-    2,      // zone 6
-    1       // zone 7
+    47,      // zone 2
+    14,      // zone 3
+    15,      // zone 4
+    10,      // zone 5
+    4,      // zone 6
+    0       // zone 7
 ];
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

@@ -36,7 +36,7 @@ def compute_tss(power_watts: int, ftp_watts: int, duration_hours: float = 1.0) -
     return duration_hours * (IF ** 2) * 100
 
 
-FTP = 212.0
+FTP = 200.0
 
 powers = np.arange(0, int(FTP * 1.5)+1, 1, dtype=float)
 fat_kcal = np.array([fat_kcal_per_hour(p, FTP) for p in powers])
@@ -69,7 +69,7 @@ plt.plot(powers, total_kcal, linestyle='dashed')
 # plt.plot(powers, tss, linestyle='dotted')
 # plt.plot(powers, calories_per_tss, linestyle='dashdot')
 plt.xlabel("Power (W)")
-plt.ylabel("Fat calories burned per hour (kcal/h)")
-plt.title("Estimated Fat Calories per Hour vs Power (FTP = 212 W)")
+plt.ylabel("Calories burned per hour (kcal/h)")
+plt.title("Estimated Calories per Hour vs Power (FTP = 200W)")
 plt.grid(True)
 plt.show()

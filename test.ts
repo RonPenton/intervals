@@ -1,19 +1,21 @@
 import 'dotenv-json2/config';
 import fs from 'fs';
 import { getWellnessOnDate, setWellnessOnDate } from './src/intervals-api';
+import { Temporal } from 'temporal-polyfill';
+import { addDays } from './src/days';
 
 export type Entry = {
     date: string;
-    resting: string;
+    lb: number;
 }
 
-const filename = 'hr.json';
+const filename = 'weights.json';
 
-const hr: Entry[] = JSON.parse(fs.readFileSync(filename, 'utf-8'));
+const weights: Entry[] = JSON.parse(fs.readFileSync(filename, 'utf-8'));
 
 const map = new Map<string, Entry>();
 
-hr.forEach(entry => {
+weights.forEach(entry => {
     map.set(entry.date, entry);
 });
 
@@ -21,7 +23,7 @@ hr.forEach(entry => {
 const unique = Array.from(map.values());
 unique.sort((a: Entry, b: Entry) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-console.log(unique);
+//console.log(unique);
 
 
 
@@ -56,10 +58,54 @@ console.log(unique);
 //     }
 // }
 
+const poundsToKg = (lb: number) => {
+    return Math.round(lb / 2.20462 * 10) / 10;
+}
+
+const kgToPounds = (kg: number) => {
+    return Math.round(kg * 2.20462 * 10) / 10;
+}
+
 async function go() {
-    for(const entry of unique) {
-        await updateWellness(entry);
+
+
+
+    const startDate = Temporal.PlainDate.from('2021-09-02');
+    const endDate = Temporal.PlainDate.from('2022-01-29');
+
+    const startEntry = map.get(startDate.toString());
+    const endEntry = map.get(endDate.toString());
+
+    console.log({ startEntry, endEntry });
+
+    if (!startEntry || !endEntry) {
+        throw new Error('Start or end entry not found');
     }
+
+    let weight = startEntry.lb;
+    const difference = endEntry.lb - startEntry.lb;
+    const days = startDate.until(endDate).days;
+    const dailyChange = difference / days;
+
+    console.log({ weight, difference, days, dailyChange });
+
+    let date = addDays(startDate, 1);
+    while (date.toString() != endDate.toString()) {
+        //console.log(date.toString());
+
+        weight += dailyChange;
+        const kg = poundsToKg(weight);
+
+        const wellness = await getWellnessOnDate(date.toString());
+        if (wellness.weight !== null) {
+            console.log(` ${date.toString()} --  Weight: ${weight.toFixed(1)} lb (${kg.toFixed(1)} kg)`);
+            wellness.weight = kg;
+            await setWellnessOnDate(date.toString(), wellness);
+        }
+
+        date = addDays(date, 1);
+    }
+
 }
 
 void go();
@@ -68,11 +114,13 @@ async function updateWellness(entry: Entry) {
     const wellness = await getWellnessOnDate(entry.date);
     //console.log(wellness);
 
-    const val = parseInt(entry.resting);
+    const val = entry.lb;
+    const kg = Math.round(val / 2.20462 * 10) / 10;
+    const oldkg = Number((wellness.weight ?? 0).toFixed(1));
 
-    if(wellness.restingHR !== val) {
-        console.log(`Updating wellness for ${entry.date}: ${wellness.restingHR} => ${val}`);
-        wellness.restingHR = val;
+    if (oldkg !== val) {
+        console.log(`Updating wellness for ${entry.date}: ${oldkg} => ${kg}`);
+        wellness.weight = kg;
         await setWellnessOnDate(entry.date, wellness);
     }
 }
