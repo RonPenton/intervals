@@ -22,6 +22,27 @@ const foods = {
         gramsPerContainer: 2268,
         pricePerContainer: 21.20
     },
+    bigGummies: {
+        servingCarbGrams: (35/32) * 22,
+        unitsPerServing: 1,
+        gramsPerServing: 35,
+        gramsPerContainer: 453.592,
+        pricePerCotnainer: 5.99
+    },
+    pumpkinGummies: {
+        servingCarbGrams: (7/32) * 22,
+        unitsPerServing: 1,
+        gramsPerServing: 7,
+        gramsPerContainer: 453.592,
+        pricePerContainer: 4.99  
+    },
+    gummyWorms: {
+        servingCarbGrams: (11.4/32) * 22,
+        unitsPerServing: 1,
+        gramsPerServing: 11.4,
+        gramsPerContainer: 453.592,
+        pricePerContainer: 4.49
+    },
     bloks: {
         servingCarbGrams: 24,
         unitsPerServing: 3,
@@ -45,7 +66,7 @@ const foods = {
     }
 } as const;
 
-const chosenFood: keyof typeof foods = 'gummies';
+const chosenFood: keyof typeof foods = 'gummyWorms';
 
 
 async function go() {
