@@ -1,9 +1,15 @@
+import "dotenv-json2/config";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
-import path from "path";
+import { auth } from "./auth";
 
 const app = new Hono();
+
+// Better-auth handles all /api/auth/* routes
+app.on(["POST", "GET"], "/api/auth/**", (c) => {
+  return auth.handler(c.req.raw);
+});
 
 // API routes
 app.get("/api/about", (c) => {

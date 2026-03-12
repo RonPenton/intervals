@@ -20,7 +20,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-COPY --from=build /app/*.js ./
 COPY --from=build /app/src/*.js ./src/
 COPY --from=build /app/src/db/*.js ./src/db/
 

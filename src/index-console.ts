@@ -8,7 +8,6 @@ import { calculateCogganPowerZones, getPeakSevenDayTSS, printTargetRide, zonesTo
 import { CurrentIntervalProgressions } from './types';
 import fs from 'fs';
 import { intervalLengths } from './training-definitions';
-import { migrate, upsertActivities, upsertWellnessBatch, upsertSchedules, closePool } from './db';
 
 const willRideToday = true;
 const daysToAdd = 10;
@@ -59,11 +58,6 @@ async function go() {
 
     fs.writeFileSync('./raw-activities.json', JSON.stringify(rawRides, null, 2));
 
-    // Persist to Postgres
-    await migrate();
-    await upsertActivities(rides, rawRides);
-    await upsertWellnessBatch(wellness, rawWellness);
-    console.log(`Persisted ${rides.length} activities and ${wellness.length} wellness records to Postgres.`);
     // const outputFile = './activities.json';
     // const activities = JSON.stringify(rides);
     // fs.writeFileSync(outputFile, activities);
@@ -161,9 +155,9 @@ async function go() {
 
     // Persist computed schedules
     await upsertSchedules(schedules);
-    console.log(`Persisted ${schedules.length} schedule records to Postgres.`);
+    console.log(`Persisted ${schedules.length} schedule records to MongoDB.`);
 
-    await closePool();
+    await disconnect();
 }
 
 

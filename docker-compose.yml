@@ -2,18 +2,14 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:16-alpine
+    image: mongo:7
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: intervals
-      POSTGRES_PASSWORD: intervals
-      POSTGRES_DB: intervals
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mongodata:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U intervals"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -27,11 +23,7 @@ services:
     expose:
       - "3000"
     environment:
-      PGHOST: db
-      PGPORT: 5432
-      PGDATABASE: intervals
-      PGUSER: intervals
-      PGPASSWORD: intervals
+      MONGO_URI: mongodb://db:27017/intervals
     env_file:
       - .env.json         # mounted so dotenv-json2 can read it at runtime
     volumes:
@@ -50,4 +42,4 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
 
 volumes:
-  pgdata:
+  mongodata:

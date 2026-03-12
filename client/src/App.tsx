@@ -1,4 +1,5 @@
 import { Container, Typography, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import SignUp from "./SignUp";
 
 const theme = createTheme({
   palette: {
@@ -14,7 +15,7 @@ export default function App() {
         <Typography variant="h3" gutterBottom>
           Intervals
         </Typography>
-        <Typography variant="body1">Welcome to Intervals.</Typography>
+        <SignUp />
       </Container>
     </ThemeProvider>
   );
