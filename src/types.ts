@@ -72,3 +72,33 @@ export type Athlete = {
     warmupMinutes: number;
     cooldownMinutes: number;
 }
+
+export type Sign = '-' | '+';
+export type Delta = `D${Sign}${number}`;
+
+export type ScheduleRecord = {
+    date: string;
+    fitness?: number;
+    fatigue?: number;
+    form?: number;
+    trainingLoad?: number;
+
+    targetForm?: number | 'decay' | 'maintain' | Delta;
+    targetFormPercent?: number | Delta;
+    targetTomorrowForm?: number;
+    targetTomorrowFormPercent?: number;
+    targetFitness?: number | 'maintain' | Delta;
+    targetFatigue?: number | 'maintain' | Delta;
+
+    targetTrainingLoad?: number;
+    minMinutes?: number;
+    maxMinutes?: number;
+    minZone?: number;
+    maxZone?: number;
+
+    needsRide?: boolean;
+    rideOptions?: TargetRide[];
+    zone?: number;
+}
+
+export type Schedule = ScheduleRecord[];
