@@ -8,15 +8,13 @@ const client = new MongoClient(MONGO_URI);
 const db = client.db();
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db, {
-    client, // enables transactions if the server supports them
-  }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  trustedOrigins: [
-    process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  ],
+    database: mongodbAdapter(db),
+    emailAndPassword: {
+        enabled: true,
+    },
+    secret: process.env.BETTER_AUTH_SECRET,
+    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    trustedOrigins: [
+        process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    ],
 });
