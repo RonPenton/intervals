@@ -12,9 +12,18 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    user: {
+        additionalFields: {
+            intervalsUserId: {
+                type: "string",
+                required: false,
+            },
+        },
+    },
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     trustedOrigins: [
         process.env.BETTER_AUTH_URL || "http://localhost:3000",
+        "http://localhost:5173",
     ],
 });

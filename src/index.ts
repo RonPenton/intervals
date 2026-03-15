@@ -4,6 +4,8 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { auth } from "./auth";
 import { cors } from "hono/cors";
+import { scheduleRoutes } from "./api-schedules";
+import { targetRoutes } from "./api-targets";
 
 const port = Number(process.env.PORT ?? 3000);
 
@@ -33,7 +35,7 @@ app.use("*", async (c, next) => {
 app.use(
     "/api/auth/*", // or replace with "*" to enable cors for all routes
     cors({
-        origin: `http://localhost:${port}`, // replace with your origin
+        origin: [`http://localhost:${port}`, "http://localhost:5173"], // replace with your origin
         allowHeaders: ["Content-Type", "Authorization"],
         allowMethods: ["POST", "GET", "OPTIONS"],
         exposeHeaders: ["Content-Length"],
@@ -56,6 +58,9 @@ app.get("/api/about", (c) => {
         version: "1.0.0",
     });
 });
+
+app.route("/api", scheduleRoutes);
+app.route("/api", targetRoutes);
 
 // Serve static files from the built client
 app.use("/*", serveStatic({ root: "./dist/client" }));

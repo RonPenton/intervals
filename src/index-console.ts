@@ -28,17 +28,17 @@ const currentIntervalProgressions: CurrentIntervalProgressions = [
 ];
 
 function setSchedules(set: SetSchedule) {
-    set({ date: '2025-10-17', targetFormPercent: 25 });             // Friday
-    set({ date: '2025-10-18', targetTrainingLoad: 0 });             // Saturday
-    set({ date: '2025-10-19', targetFormPercent: 20 });             // Sunday
-    set({ date: '2025-10-20', targetFormPercent: 19 });              // Monday
-    set({ date: '2025-10-21', targetFormPercent: 17 });               // Tuesday
-    set({ date: '2025-10-22', targetFormPercent: 15 });               // Wednesday
-    set({ date: '2025-10-23', targetFormPercent: 14 });              // Thursday
-    set({ date: '2025-10-24', targetFormPercent: 12 });             // Friday
-    set({ date: '2025-10-25', targetFormPercent: 10 });             // Saturday
-    set({ date: '2025-10-26', targetFormPercent: 8 });              // Sunday
-    set({ date: '2025-10-27', targetFormPercent: 6 });              // Monday
+    set({ date: '2025-10-17', targetFormPercent: 25, userId: "0" });             // Friday
+    set({ date: '2025-10-18', targetTrainingLoad: 0, userId: "0" });             // Saturday
+    set({ date: '2025-10-19', targetFormPercent: 20, userId: "0" });             // Sunday
+    set({ date: '2025-10-20', targetFormPercent: 19, userId: "0" });              // Monday
+    set({ date: '2025-10-21', targetFormPercent: 17, userId: "0" });               // Tuesday
+    set({ date: '2025-10-22', targetFormPercent: 15, userId: "0" });               // Wednesday
+    set({ date: '2025-10-23', targetFormPercent: 14, userId: "0" });              // Thursday
+    set({ date: '2025-10-24', targetFormPercent: 12, userId: "0" });             // Friday
+    set({ date: '2025-10-25', targetFormPercent: 10, userId: "0" });             // Saturday
+    set({ date: '2025-10-26', targetFormPercent: 8, userId: "0" });              // Sunday
+    set({ date: '2025-10-27', targetFormPercent: 6, userId: "0" });              // Monday
 
 }
 

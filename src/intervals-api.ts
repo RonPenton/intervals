@@ -47,7 +47,7 @@ export async function getRides(
 
     const data = await response.json() as ICUActivity[];
 
-    const rides = data.filter((activity: any) => activity.type === 'Ride');
+    const rides = data.filter((activity: any) => activity.type === 'Ride' || activity.type === 'VirtualRide');
     return rides;
 }
 
