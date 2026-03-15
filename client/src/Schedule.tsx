@@ -11,18 +11,14 @@ import {
   Typography,
   Paper,
   Chip,
-  TextField,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import {
   TargetType,
-  targetOptions,
   parseTargetValue,
-  getTargetPlaceholder,
   getActiveTarget,
 } from "./DayTargetEditor";
-import type { Delta } from "../../src/types";
+import TargetRow from "./TargetRow";
+import type { TargetValues, FutureDay } from "./TargetRow";
 
 interface PastDay {
   date: string;
@@ -34,34 +30,11 @@ interface PastDay {
   needsRide?: undefined;
 }
 
-interface FutureDay {
-  date: string;
-  needsRide: true;
-  fitness?: number;
-  fatigue?: number;
-  form?: number;
-  trainingLoad?: number;
-}
-
 type ScheduleRecord = PastDay | FutureDay;
 
 interface ScheduleResponse {
   schedules: ScheduleRecord[];
   ftp: number;
-}
-
-interface TargetValues {
-  targetForm?: number | "decay" | "maintain" | Delta;
-  targetFormPercent?: number | Delta;
-  targetTomorrowForm?: number;
-  targetTomorrowFormPercent?: number;
-  targetFitness?: number | "maintain" | Delta;
-  targetFatigue?: number | "maintain" | Delta;
-  targetTrainingLoad?: number;
-  minMinutes?: number;
-  maxMinutes?: number;
-  minZone?: number;
-  maxZone?: number;
 }
 
 function formatDate(dateStr: string) {
@@ -75,61 +48,10 @@ function formPercent(fitness: number, form: number) {
   return (form / fitness) * 100;
 }
 
-const ZONE_OPTIONS = ["", "1", "2", "3", "4", "5", "6", "7"];
-
-function NumericCell({
-  value,
-  onChange,
-  placeholder,
-  width = 70,
-}: {
-  value: number | undefined;
-  onChange: (v: number | undefined) => void;
-  placeholder?: string;
-  width?: number;
-}) {
-  return (
-    <TextField
-      size="small"
-      type="number"
-      variant="standard"
-      value={value ?? ""}
-      placeholder={placeholder}
-      onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
-      slotProps={{ input: { sx: { textAlign: "right", fontSize: "0.875rem" } } }}
-      sx={{ width }}
-    />
-  );
-}
-
-function ZoneCell({
-  value,
-  onChange,
-}: {
-  value: number | undefined;
-  onChange: (v: number | undefined) => void;
-}) {
-  return (
-    <Select
-      size="small"
-      variant="standard"
-      value={value ?? ""}
-      onChange={(e) => {
-        const val = String(e.target.value);
-        onChange(val === "" ? undefined : Number(val));
-      }}
-      sx={{ width: 55, fontSize: "0.875rem" }}
-    >
-      {ZONE_OPTIONS.map((z) => (
-        <MenuItem key={z} value={z}>{z ? `Z${z}` : "–"}</MenuItem>
-      ))}
-    </Select>
-  );
-}
-
 export default function Schedule() {
   const [data, setData] = useState<ScheduleResponse | null>(null);
   const [targets, setTargets] = useState<Record<string, TargetValues>>({});
+  const [selectedTypes, setSelectedTypes] = useState<Record<string, TargetType>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -152,6 +74,11 @@ export default function Schedule() {
           map[date] = values;
         }
         setTargets(map);
+        const typeMap: Record<string, TargetType> = {};
+        for (const [date, values] of Object.entries(map)) {
+          typeMap[date] = getActiveTarget(values);
+        }
+        setSelectedTypes(typeMap);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -178,6 +105,8 @@ export default function Schedule() {
   }
 
   function updateTargetType(date: string, newType: TargetType) {
+    setSelectedTypes((prev) => ({ ...prev, [date]: newType }));
+
     setTargets((prev) => {
       const existing = prev[date] ?? {};
       const cleared: TargetValues = {
@@ -324,62 +253,18 @@ export default function Schedule() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {futureDays.map((row) => {
-              const t = targets[row.date] ?? {};
-              const activeType = getActiveTarget(t);
-              const activeValue = activeType !== "none" ? String(t[activeType as keyof TargetValues] ?? "") : "";
-              return (
-                <TableRow key={row.date}>
-                  <TableCell>{formatDate(row.date)}</TableCell>
-                  <TableCell align="right">{row.fitness != null ? Math.round(row.fitness) : "–"}</TableCell>
-                  <TableCell align="right">{row.fatigue != null ? Math.round(row.fatigue) : "–"}</TableCell>
-                  <TableCell align="right">{row.form != null ? Math.round(row.form) : "–"}</TableCell>
-                  <TableCell align="right">
-                    {row.fitness != null && row.form != null ? `${Math.round(formPercent(row.fitness, row.form))}%` : "–"}
-                  </TableCell>
-                  <TableCell align="right">{row.trainingLoad != null ? row.trainingLoad.toFixed(1) : "–"}</TableCell>
-                  <TableCell>
-                    <Select
-                      size="small"
-                      variant="standard"
-                      value={activeType}
-                      onChange={(e) => updateTargetType(row.date, e.target.value as TargetType)}
-                      sx={{ minWidth: 130, fontSize: "0.875rem" }}
-                    >
-                      {targetOptions.map((opt) => (
-                        <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    {activeType !== "none" && (
-                      <TextField
-                        size="small"
-                        variant="standard"
-                        placeholder={getTargetPlaceholder(activeType)}
-                        defaultValue={activeValue}
-                        key={`${row.date}-${activeType}`}
-                        onBlur={(e) => updateTargetValue(row.date, activeType, e.target.value)}
-                        sx={{ width: 110 }}
-                        slotProps={{ input: { sx: { fontSize: "0.875rem" } } }}
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    <NumericCell value={t.minMinutes} onChange={(v) => updateConstraint(row.date, "minMinutes", v)} placeholder="Min" />
-                  </TableCell>
-                  <TableCell align="right">
-                    <NumericCell value={t.maxMinutes} onChange={(v) => updateConstraint(row.date, "maxMinutes", v)} placeholder="Max" />
-                  </TableCell>
-                  <TableCell align="right">
-                    <ZoneCell value={t.minZone} onChange={(v) => updateConstraint(row.date, "minZone", v)} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <ZoneCell value={t.maxZone} onChange={(v) => updateConstraint(row.date, "maxZone", v)} />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {futureDays.map((row) => (
+              <TargetRow
+                key={row.date}
+                row={row}
+                targets={targets[row.date] ?? {}}
+                activeType={selectedTypes[row.date] ?? getActiveTarget(targets[row.date] ?? {})}
+                onUpdateConstraint={updateConstraint}
+                onUpdateTargetType={updateTargetType}
+                onUpdateTargetValue={updateTargetValue}
+                onClearTargetType={(date) => setSelectedTypes((prev) => ({ ...prev, [date]: "none" }))}
+              />
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
