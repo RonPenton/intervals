@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist/export",
+    "noEmitOnError": true
+  },
+  "include": ["src/training-export/**/*.ts"],
+  "exclude": ["node_modules", "dist", "client"]
+}

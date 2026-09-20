@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "export": "tsc -p tsconfig.export.json && node dist/export/training-export/cli.js",
+    "check:export": "tsc -p tsconfig.export.json --noEmit",
+    "test:export": "tsc -p tsconfig.export.json && node --test dist/export/training-export/*.test.js",
     "start": "npx tsx src/index.ts",
     "dev": "concurrently -n server,client -c blue,green \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "npx tsx watch src/index.ts",
