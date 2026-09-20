@@ -43,7 +43,7 @@ targetRoutes.put("/targets", async (c) => {
     const target = await TargetValuesModel.findOneAndUpdate(
         { userId: user.id, date },
         { $set: { ...values, userId: user.id, date } },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
     );
 
     return c.json({ target });

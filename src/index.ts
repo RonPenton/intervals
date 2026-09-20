@@ -6,9 +6,9 @@ import { auth } from "./auth";
 import { cors } from "hono/cors";
 import { scheduleRoutes } from "./api-schedules";
 import { targetRoutes } from "./api-targets";
+import { connect } from "./db";
 
 const port = Number(process.env.PORT ?? 3000);
-
 
 const app = new Hono<{
     Variables: {
@@ -33,9 +33,9 @@ app.use("*", async (c, next) => {
 });
 
 app.use(
-    "/api/auth/*", // or replace with "*" to enable cors for all routes
+    "/api/auth/*",
     cors({
-        origin: [`http://localhost:${port}`, "http://localhost:5173"], // replace with your origin
+        origin: [`http://localhost:${port}`, "http://localhost:5173"],
         allowHeaders: ["Content-Type", "Authorization"],
         allowMethods: ["POST", "GET", "OPTIONS"],
         exposeHeaders: ["Content-Length"],
@@ -44,14 +44,10 @@ app.use(
     }),
 );
 
-// Better-auth handles all /api/auth/* routes
 app.on(["POST", "GET"], "/api/auth/**", (c) => {
     return auth.handler(c.req.raw);
 });
 
-
-
-// API routes
 app.get("/api/about", (c) => {
     return c.json({
         name: "intervals",
@@ -62,11 +58,10 @@ app.get("/api/about", (c) => {
 app.route("/api", scheduleRoutes);
 app.route("/api", targetRoutes);
 
-// Serve static files from the built client
 app.use("/*", serveStatic({ root: "./dist/client" }));
-
-// Fallback to index.html for client-side routing
 app.get("/*", serveStatic({ root: "./dist/client", path: "index.html" }));
 
-console.log(`Server running on http://localhost:${port}`);
-serve({ fetch: app.fetch, port });
+connect().then(() => {
+    console.log(`Server running on http://localhost:${port}`);
+    serve({ fetch: app.fetch, port });
+});

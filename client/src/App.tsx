@@ -59,7 +59,7 @@ export default function App() {
           )}
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
         <Routes>
           <Route path="/login" element={
             loggedIn ? <Navigate to="/" /> : <Auth onSuccess={handleLoginSuccess} />

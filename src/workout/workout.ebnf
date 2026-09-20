@@ -1,0 +1,133 @@
+(* Workout Grammar — EBNF *)
+(* Indentation is significant: indent/dedent delimit blocks (Python-style). *)
+
+
+(* ─── Top Level ─────────────────────────────────────────────────────────── *)
+
+workout     = { section } ;
+
+section     = label-line , block ;
+label-line  = text , ":" , newline ;
+
+block       = INDENT , { statement } , DEDENT ;
+
+statement   = step
+            | count-loop
+            | range-loop
+            | section ;
+
+
+(* ─── Steps ─────────────────────────────────────────────────────────────── *)
+
+step        = duration , [ "@" ] , intensity , newline ;
+
+duration    = dur-h | dur-m | dur-s ;
+dur-h       = scalar , "h" , [ scalar , "m" ] , [ scalar , "s" ] ;  (* 1h  1h30m  1h30m15s *)
+dur-m       = scalar , "m" , [ scalar , "s" ] ;                      (* 2m  2m30s            *)
+dur-s       = scalar , "s" ;                                         (* 30s                  *)
+
+(* One or more targets; at most one per domain (power, heart-rate, cadence); order is free *)
+intensity           = intensity-target , { intensity-target } ;
+intensity-target    = power-intensity | heart-rate-intensity | cadence-intensity ;
+
+
+(* ─── Power Intensity ───────────────────────────────────────────────────── *)
+(* 100w              → absolute watts                                        *)
+(* 100-150w          → watts range                                           *)
+(* 100%              → % of FTP                                              *)
+(* 100-110%          → % of FTP range                                        *)
+(* 90% MMP 20m       → % of mean maximal power for duration                  *)
+(* 90-100% MMP 20m   → % of MMP range                                        *)
+(* Z3                → power zone (Z1-Z7)                                    *)
+(* SS                → sweet spot                                            *)
+(* Z3-Z4, SS-Z4      → power zone range                                      *)
+
+power-intensity     = watts | power-percentage | power-zone ;
+
+watts               = scalar-range , "w" ;
+
+power-percentage    = scalar-range , "%" , [ "MMP" , duration ] ;
+
+power-zone          = power-zone-value , [ "-" , power-zone-value ] ;
+power-zone-value    = "Z" , zone-digit | "SS" ;
+
+
+(* ─── Heart Rate Intensity ──────────────────────────────────────────────── *)
+(* 70% HR            → % of max heart rate                                   *)
+(* 70-80% HR         → % of max HR range                                     *)
+(* 80% LTHR          → % of lactate threshold HR                             *)
+(* 80-90% LTHR       → % of LTHR range                                       *)
+(* Z2 HR             → heart rate zone (Z1-Z7)                               *)
+(* Z2-Z3 HR          → heart rate zone range                                 *)
+
+heart-rate-intensity = hr-percentage | hr-zone ;
+
+hr-percentage       = scalar-range , "%" , hr-ref ;
+hr-ref              = "HR" | "LTHR" ;
+
+hr-zone             = hr-zone-value , [ "-" , hr-zone-value ] , "HR" ;
+hr-zone-value       = "Z" , zone-digit ;
+
+zone-digit          = "1" | "2" | "3" | "4" | "5" | "6" | "7" ;
+
+
+(* ─── Cadence Intensity ─────────────────────────────────────────────────── *)
+(* 80rpm             → cadence target                                        *)
+(* 80-90rpm          → cadence range                                         *)
+
+cadence-intensity   = scalar-range , "rpm" ;
+
+(* Shared: single value or lo-hi range *)
+scalar-range = scalar , [ "-" , scalar ] ;
+
+
+(* ─── Loops ─────────────────────────────────────────────────────────────── *)
+
+(* Count loop:  3x as rep:  *)
+count-loop  = pos-integer , "x" , "as" , identifier , ":" , newline , block ;
+
+(* Range loop:  65..75% step 5 as power:  *)
+range-loop  = number , ".." , number , [ "%" ] ,
+              [ "step" , number ] ,
+              "as" , identifier , ":" , newline , block ;
+
+
+(* ─── Scalar (number or interpolated expression) ────────────────────────── *)
+
+scalar      = number
+            | "{" , expr , "}" ;
+
+
+(* ─── Expressions ───────────────────────────────────────────────────────── *)
+
+expr        = term , { ( "+" | "-" ) , term } ;
+term        = factor , { ( "*" | "/" ) , factor } ;
+factor      = number
+            | identifier
+            | "(" , expr , ")" ;
+
+
+(* ─── Interpolated Text (used in label-line) ────────────────────────────── *)
+
+text        = { plain-chars | "{" , expr , "}" } ;
+plain-chars = character , { character } ;     (* any chars except "{", "}", newline *)
+
+
+(* ─── Primitives ─────────────────────────────────────────────────────────── *)
+
+number      = [ "-" ] , digits , [ "." , digits ] ;
+pos-integer = nonzero-digit , { digit } ;
+digits      = digit , { digit } ;
+digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+nonzero-digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+identifier  = letter , { letter | digit | "_" } ;
+letter      = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+            | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t"
+            | "u" | "v" | "w" | "x" | "y" | "z"
+            | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
+            | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
+            | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+
+newline     = "\n" ;
+INDENT      = (* increase in indentation relative to prior line *) ;
+DEDENT      = (* decrease in indentation relative to prior line *) ;

@@ -6,13 +6,13 @@ import { CogganPowerZones } from "./training-definitions";
 import { computeRoughCarbBurnedPercentage } from './training';
 
 const seasonStart = new Temporal.PlainDate(getToday().year, 1, 1);
-const zone = 2;
-const minHours = 2;
-const rideSpeedMph = 12;
-const rideDistanceMiles = 65;
+const zone = 3;
+const minHours = 1.5;
+const rideSpeedMph = 8.4;
+const rideDistanceMiles = 30;
 const rideDurationHours = rideDistanceMiles / rideSpeedMph;
 const feedIntervalMinutes = 45;
-const buffer = 1.0;
+const buffer = 1.2;
 
 const foods = {
     gummies: {
@@ -23,21 +23,21 @@ const foods = {
         pricePerContainer: 21.20
     },
     bigGummies: {
-        servingCarbGrams: (35/32) * 22,
+        servingCarbGrams: (35 / 32) * 22,
         unitsPerServing: 1,
         gramsPerServing: 35,
         gramsPerContainer: 453.592,
         pricePerContainer: 5.99
     },
     pumpkinGummies: {
-        servingCarbGrams: (7/32) * 22,
+        servingCarbGrams: (7 / 32) * 22,
         unitsPerServing: 1,
         gramsPerServing: 7,
         gramsPerContainer: 453.592,
-        pricePerContainer: 4.99  
+        pricePerContainer: 4.99
     },
     gummyWorms: {
-        servingCarbGrams: (11.4/32) * 22,
+        servingCarbGrams: (11.4 / 32) * 22,
         unitsPerServing: 1,
         gramsPerServing: 11.4,
         gramsPerContainer: 453.592,
@@ -146,6 +146,9 @@ async function go() {
 
     const totalUnitsToPack = feedsPerRide * numberPerPeriod;
     console.log(`Total ${chosenFood} to pack: ${totalUnitsToPack.toFixed(0)} (${feedsPerRide} x ${numberPerPeriod})`);
+
+    const actualCarbsPerHour = ((numberPerPeriod * carbsPerUnit) / feedIntervalMinutes) * 60;
+    console.log(`Actual Carbs per Hour: ${actualCarbsPerHour.toFixed(1)}`);
 
     const servingsPerContainer = foods[chosenFood].gramsPerContainer / foods[chosenFood].gramsPerServing;
     console.log(`Servings per container: ${servingsPerContainer.toFixed(1)}`);

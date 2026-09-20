@@ -1,0 +1,252 @@
+openapi: 3.1.0
+info:
+  title: Intervals ICU Workout Doc Schema
+  description: Describes the structure of the workout_doc field returned in planned workout events from the Intervals ICU API.
+  version: 1.0.0
+
+components:
+  schemas:
+
+    WorkoutDoc:
+      type: object
+      description: The parsed, structured representation of a planned workout.
+      properties:
+        steps:
+          type: array
+          description: Ordered list of workout steps. Each step is either a single effort or a repeat block.
+          items:
+            $ref: '#/components/schemas/Step'
+        locales:
+          type: array
+          description: Locale-specific step label overrides. Empty when no translations are defined.
+          items:
+            type: object
+        options:
+          type: object
+          description: Additional workout options. Empty object in most cases.
+          additionalProperties: true
+        distance:
+          type: number
+          description: Total planned distance in meters. 0 for time-based workouts.
+        duration:
+          type: integer
+          description: Total planned duration in seconds.
+        zoneTimes:
+          type: array
+          description: Projected time (in seconds) spent in each power zone across the workout.
+          items:
+            $ref: '#/components/schemas/ZoneTime'
+        strain_score:
+          $ref: '#/components/schemas/StrainScore'
+        average_watts:
+          type: integer
+          description: Projected average power output in watts for the whole workout.
+        normalized_power:
+          type: integer
+          description: Projected normalized power in watts.
+        variability_index:
+          type: number
+          format: float
+          description: Ratio of normalized power to average power (NP / AP).
+        polarization_index:
+          type: number
+          format: float
+          description: Polarization index of the workout intensity distribution.
+
+    Step:
+      oneOf:
+        - $ref: '#/components/schemas/EffortStep'
+        - $ref: '#/components/schemas/RepeatStep'
+      description: >
+        A single workout step. Either a simple effort (EffortStep) or a repeat block
+        containing nested steps (RepeatStep). Discriminated by the presence of the
+        `reps` and `steps` fields.
+
+    EffortStep:
+      type: object
+      description: A single timed effort at a given power target.
+      required:
+        - power
+        - duration
+      properties:
+        power:
+          $ref: '#/components/schemas/PowerTarget'
+        duration:
+          type: integer
+          description: Duration of this step in seconds.
+        text:
+          type: string
+          description: Optional display label shown to the athlete (e.g. "Press lap").
+        until_lap_press:
+          type: boolean
+          description: >
+            If true, the step continues until the athlete manually presses the lap
+            button on their device. The duration field is used as the default/fallback.
+
+    RepeatStep:
+      type: object
+      description: A repeat block containing nested steps to be performed multiple times.
+      required:
+        - reps
+        - steps
+        - duration
+      properties:
+        reps:
+          type: integer
+          description: Number of times to repeat the nested steps.
+        text:
+          type: string
+          description: Display label for the repeat block (e.g. "2x", "4x").
+        steps:
+          type: array
+          description: The ordered list of steps to repeat. These are always EffortSteps.
+          items:
+            $ref: '#/components/schemas/EffortStep'
+        distance:
+          type: number
+          description: Total distance in meters for all repetitions combined. 0 for time-based blocks.
+        duration:
+          type: integer
+          description: Total duration in seconds for all repetitions combined.
+
+    PowerTarget:
+      oneOf:
+        - $ref: '#/components/schemas/SingleValuePowerTarget'
+        - $ref: '#/components/schemas/RangePowerTarget'
+      description: >
+        The power target for a step. Either a single fixed value or a range (start/end).
+        Discriminated by the presence of `value` vs `start`+`end`.
+
+    SingleValuePowerTarget:
+      type: object
+      description: A single fixed power target.
+      required:
+        - units
+        - value
+      properties:
+        units:
+          type: string
+          description: >
+            The unit system for the power value.
+            - `%ftp`: percentage of the athlete's FTP
+            - `power_zone`: a named power zone number (1=Z1 through 9=Sweet Spot)
+          enum:
+            - '%ftp'
+            - power_zone
+        value:
+          type: number
+          description: >
+            The target value. Interpreted according to `units`:
+            for `%ftp` this is a percentage (e.g. 75 = 75% FTP),
+            for `power_zone` this is a zone number (e.g. 2 = Z2, 9 = Sweet Spot).
+        target:
+          type: string
+          description: >
+            Optional averaging window for the power display on device (e.g. "30s"
+            means show a 30-second rolling average). Absent when not specified.
+          example: '30s'
+
+    RangePowerTarget:
+      type: object
+      description: A power range target with a lower and upper bound.
+      required:
+        - units
+        - start
+        - end
+      properties:
+        units:
+          type: string
+          description: The unit system for the range values. Always `%ftp` for range targets.
+          enum:
+            - '%ftp'
+        start:
+          type: number
+          description: Lower bound of the power range as a percentage of FTP.
+        end:
+          type: number
+          description: Upper bound of the power range as a percentage of FTP.
+        target:
+          type: string
+          description: Optional averaging window for device display (e.g. "30s").
+          example: '30s'
+
+    ZoneTime:
+      type: object
+      description: Projected time spent in a specific training zone during the workout.
+      required:
+        - id
+        - name
+        - zone
+        - secs
+        - min
+        - max
+        - minWatts
+        - maxWatts
+        - color
+        - percentRange
+      properties:
+        id:
+          type: string
+          description: Zone identifier string (e.g. "Z1", "Z2", ..., "Z7", "SS").
+          example: Z2
+        name:
+          type: string
+          description: Human-readable zone name (e.g. "Z2", "Sweet Spot").
+          example: Sweet Spot
+        zone:
+          type: integer
+          description: Numeric zone index (1–7 for standard zones, 8 for Sweet Spot).
+        secs:
+          type: integer
+          description: Projected seconds spent in this zone during the workout.
+        min:
+          type: number
+          description: Lower bound of the zone as a percentage of FTP. Absent on standard zones (Z1–Z7) where `max` of the previous zone implies the lower bound.
+        max:
+          type: number
+          description: Upper bound of the zone as a percentage of FTP.
+        minWatts:
+          type: integer
+          description: Lower bound of the zone in absolute watts, calculated from the athlete's FTP.
+        maxWatts:
+          type: integer
+          description: Upper bound of the zone in absolute watts.
+        color:
+          type: string
+          description: Hex color code used to display this zone in the UI.
+          example: '#009e00'
+        percentRange:
+          type: string
+          description: Human-readable percentage range string for display (e.g. "56% - 75%").
+          example: '56% - 75%'
+        gap:
+          type: boolean
+          description: >
+            If true, this zone is an overlay zone (e.g. Sweet Spot overlaps Z3/Z4)
+            rather than a contiguous zone in the standard sequence.
+
+    StrainScore:
+      type: object
+      description: Strain score metrics computed for the workout, based on the CP model.
+      required:
+        - ss_cp
+        - ss_p_max
+        - ss_w_prime
+        - strain_score
+      properties:
+        ss_cp:
+          type: number
+          format: float
+          description: Critical power component of the strain score.
+        ss_p_max:
+          type: number
+          format: float
+          description: Maximum power component of the strain score.
+        ss_w_prime:
+          type: number
+          format: float
+          description: W' (anaerobic work capacity) component of the strain score.
+        strain_score:
+          type: number
+          format: float
+          description: Overall strain score for the workout.

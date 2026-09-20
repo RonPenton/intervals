@@ -1,0 +1,1744 @@
+[
+  {
+    "id": 105228470,
+    "start_date_local": "2026-04-19T00:00:00",
+    "icu_training_load": 25,
+    "icu_atl": 56.439816,
+    "icu_ctl": 48.887836,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 35.304684,
+    "calendar_id": 1,
+    "uid": "1817233b-ec8f-47c1-a394-0c8c9485088c",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-20T00:00:00",
+    "name": "ded recoverals",
+    "description": "* 2m 50%\n* 2m 55%\n\n2x\n* 90s 50%\n* 2m 60%\n* 30S 55%\n* 90s 50%\n* 2m 65%\n* 30S 60%\n* 90s 50%\n* 2m 70%\n* 30S 65%\n* 90s 50%\n* 2m 75%\n* 30S 70%\n\n* 1m 65%\n* 1m 60%\n* 2m 50%\n",
+    "indoor": false,
+    "color": null,
+    "moving_time": 2400,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-19T13:12:49.800+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 335220,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "power": {
+            "units": "%ftp",
+            "value": 50
+          },
+          "duration": 120
+        },
+        {
+          "power": {
+            "units": "%ftp",
+            "value": 55
+          },
+          "duration": 120
+        },
+        {
+          "reps": 2,
+          "text": "2x",
+          "steps": [
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 50
+              },
+              "duration": 90
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 60
+              },
+              "duration": 120
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 55
+              },
+              "duration": 30
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 50
+              },
+              "duration": 90
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 65
+              },
+              "duration": 120
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 60
+              },
+              "duration": 30
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 50
+              },
+              "duration": 90
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 70
+              },
+              "duration": 120
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 65
+              },
+              "duration": 30
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 50
+              },
+              "duration": 90
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 75
+              },
+              "duration": 120
+            },
+            {
+              "power": {
+                "units": "%ftp",
+                "value": 70
+              },
+              "duration": 30
+            }
+          ],
+          "distance": 0,
+          "duration": 1920
+        },
+        {
+          "power": {
+            "units": "%ftp",
+            "value": 65
+          },
+          "duration": 60
+        },
+        {
+          "power": {
+            "units": "%ftp",
+            "value": 60
+          },
+          "duration": 60
+        },
+        {
+          "power": {
+            "units": "%ftp",
+            "value": 50
+          },
+          "duration": 120
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 2400,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 1140,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 1260,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 35.30468506829239,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 35.30468506829239
+      },
+      "average_watts": 140,
+      "normalized_power": 144,
+      "variability_index": 1.0285714285714285,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 61.237244,
+    "strain_score": 35.304684,
+    "plan_name": null,
+    "paired_activity_id": "i141169956"
+  },
+  {
+    "id": 104446671,
+    "start_date_local": "2026-04-20T00:00:00",
+    "icu_training_load": 46,
+    "icu_atl": 55.050045,
+    "icu_ctl": 48.81989,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 63.990868,
+    "calendar_id": 1,
+    "uid": "5dfe3396-2280-4dd9-a532-5eb1fb0919a2",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-21T00:00:00",
+    "name": "Outside Endurance v2",
+    "description": "- Press lap 65m Z2 power=30s",
+    "indoor": false,
+    "color": null,
+    "moving_time": 3900,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-14T22:56:45.032+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 600600,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 3900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 3900,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 0,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 3900,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 63.99086757990852,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 63.99086757990852
+      },
+      "average_watts": 154,
+      "normalized_power": 154,
+      "variability_index": 1,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 65.16252,
+    "strain_score": 63.990868,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104245780,
+    "start_date_local": "2026-04-21T00:00:00",
+    "icu_training_load": 86,
+    "icu_atl": 59.17017,
+    "icu_ctl": 49.694675,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 97.45428,
+    "calendar_id": 1,
+    "uid": "6ed60090-77c0-4d8a-8eae-a9b7b5e0f717",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-22T00:00:00",
+    "name": "Outside SS 4x9",
+    "description": "- 5m z2 power=30s\n- Press lap 1m Z2 power=30s\n- 5m z3 power=30s\n- 5m Z2 power=30s\n- Press lap 1m Z2 power=30s\n\n\n4x\n- 9m SS power=30s\n- 3m 30-70% power=30s\n- Press lap 1m 30-70% power=30s\n\n\n- Press lap 15m z2 power=30s\n",
+    "indoor": false,
+    "color": null,
+    "moving_time": 5040,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-18T01:01:34.352+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 883650,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 60,
+          "until_lap_press": true
+        },
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 3,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 60,
+          "until_lap_press": true
+        },
+        {
+          "reps": 4,
+          "text": "4x",
+          "steps": [
+            {
+              "power": {
+                "units": "power_zone",
+                "value": 9,
+                "target": "30s"
+              },
+              "duration": 540
+            },
+            {
+              "power": {
+                "end": 70,
+                "start": 30,
+                "units": "%ftp",
+                "target": "30s"
+              },
+              "duration": 180
+            },
+            {
+              "text": "Press lap",
+              "power": {
+                "end": 70,
+                "start": 30,
+                "units": "%ftp",
+                "target": "30s"
+              },
+              "duration": 60,
+              "until_lap_press": true
+            }
+          ],
+          "distance": 0,
+          "duration": 3120
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 5040,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 960,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 1620,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 300,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 2160,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 2160,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 97.45427450626786,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 97.45427450626786
+      },
+      "average_watts": 175,
+      "normalized_power": 186,
+      "variability_index": 1.062857142857143,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 78.37638,
+    "strain_score": 97.45428,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104446717,
+    "start_date_local": "2026-04-22T00:00:00",
+    "icu_training_load": 46,
+    "icu_atl": 57.416927,
+    "icu_ctl": 49.607746,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 63.990868,
+    "calendar_id": 1,
+    "uid": "fab19bc0-10ef-4234-b4c1-4c94dd3d99af",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-23T00:00:00",
+    "name": "Outside Endurance v2",
+    "description": "- Press lap 65m Z2 power=30s",
+    "indoor": false,
+    "color": null,
+    "moving_time": 3900,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-14T22:58:15.287+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 600600,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 3900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 3900,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 0,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 3900,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 63.99086757990852,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 63.99086757990852
+      },
+      "average_watts": 154,
+      "normalized_power": 154,
+      "variability_index": 1,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 65.16252,
+    "strain_score": 63.990868,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104446700,
+    "start_date_local": "2026-04-23T00:00:00",
+    "icu_training_load": 91,
+    "icu_atl": 61.887577,
+    "icu_ctl": 50.581635,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 103.311554,
+    "calendar_id": 1,
+    "uid": "0c551025-d869-4843-ad4d-e3ad42904833",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-24T00:00:00",
+    "name": "Outside SS 4x10",
+    "description": "- 5m z2 power=30s\n- Press lap 1m Z2 power=30s\n- 5m z3 power=30s\n- 5m Z2 power=30s\n- Press lap 1m Z2 power=30s\n\n\n4x\n- 10m SS power=30s\n- 3m 30-70% power=30s\n- Press lap 1m 30-70% power=30s\n\n\n- Press lap 15m z2 power=30s\n",
+    "indoor": false,
+    "color": null,
+    "moving_time": 5280,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-18T22:49:18.377+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 935010,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 60,
+          "until_lap_press": true
+        },
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 3,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 300
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 60,
+          "until_lap_press": true
+        },
+        {
+          "reps": 4,
+          "text": "4x",
+          "steps": [
+            {
+              "power": {
+                "units": "power_zone",
+                "value": 9,
+                "target": "30s"
+              },
+              "duration": 600
+            },
+            {
+              "power": {
+                "end": 70,
+                "start": 30,
+                "units": "%ftp",
+                "target": "30s"
+              },
+              "duration": 180
+            },
+            {
+              "text": "Press lap",
+              "power": {
+                "end": 70,
+                "start": 30,
+                "units": "%ftp",
+                "target": "30s"
+              },
+              "duration": 60,
+              "until_lap_press": true
+            }
+          ],
+          "distance": 0,
+          "duration": 3360
+        },
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 5280,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 960,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 1620,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 300,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 2400,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 2400,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 103.3115570087117,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 103.3115570087117
+      },
+      "average_watts": 177,
+      "normalized_power": 187,
+      "variability_index": 1.0564971751412429,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 78.768936,
+    "strain_score": 103.311554,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104446940,
+    "start_date_local": "2026-04-24T00:00:00",
+    "icu_training_load": 46,
+    "icu_atl": 59.77259,
+    "icu_ctl": 50.473835,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 63.990868,
+    "calendar_id": 1,
+    "uid": "f7a85f8c-9397-4194-8906-76f28b22cd23",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-25T00:00:00",
+    "name": "Outside Endurance v2",
+    "description": "- Press lap 65m Z2 power=30s",
+    "indoor": false,
+    "color": null,
+    "moving_time": 3900,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-14T22:59:51.382+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 600600,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 3900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 3900,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 0,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 3900,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 63.99086757990852,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 63.99086757990852
+      },
+      "average_watts": 154,
+      "normalized_power": 154,
+      "variability_index": 1,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 65.16252,
+    "strain_score": 63.990868,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104245824,
+    "start_date_local": "2026-04-25T00:00:00",
+    "icu_training_load": 75,
+    "icu_atl": 61.799694,
+    "icu_ctl": 51.050896,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 98.57751,
+    "calendar_id": 1,
+    "uid": "538d46f6-48ba-4ae5-b54d-4a07328e94dd",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-26T00:00:00",
+    "name": "Outside Endurance Brisk",
+    "description": "- Press lap 92m 65-75% power=30s",
+    "indoor": false,
+    "color": null,
+    "moving_time": 5520,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-14T23:00:49.503+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 913560,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "text": "Press lap",
+          "power": {
+            "end": 75,
+            "start": 65,
+            "units": "%ftp",
+            "target": "30s"
+          },
+          "duration": 5520,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 5520,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 0,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 5520,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 98.57750647429816,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 98.57750647429816
+      },
+      "average_watts": 166,
+      "normalized_power": 166,
+      "variability_index": 1,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 69.93786,
+    "strain_score": 98.57751,
+    "plan_name": null,
+    "paired_activity_id": null
+  },
+  {
+    "id": 104447069,
+    "start_date_local": "2026-04-26T00:00:00",
+    "icu_training_load": 46,
+    "icu_atl": 59.696407,
+    "icu_ctl": 50.932056,
+    "type": "Ride",
+    "carbs_used": null,
+    "ss_p_max": 0,
+    "ss_w_prime": 0,
+    "ss_cp": 63.990868,
+    "calendar_id": 1,
+    "uid": "ba2a5e6b-c7de-4e75-949f-17c11e795b0e",
+    "athlete_id": "i363885",
+    "category": "WORKOUT",
+    "end_date_local": "2026-04-27T00:00:00",
+    "name": "Outside Endurance v2",
+    "description": "- Press lap 65m Z2 power=30s",
+    "indoor": false,
+    "color": null,
+    "moving_time": 3900,
+    "icu_ftp": null,
+    "w_prime": null,
+    "p_max": null,
+    "atl_days": null,
+    "ctl_days": null,
+    "updated": "2026-04-14T23:01:05.636+00:00",
+    "not_on_fitness_chart": false,
+    "show_as_note": false,
+    "show_on_ctl_line": false,
+    "for_week": false,
+    "target": null,
+    "joules": 600600,
+    "joules_above_ftp": 0,
+    "workout_doc": {
+      "steps": [
+        {
+          "text": "Press lap",
+          "power": {
+            "units": "power_zone",
+            "value": 2,
+            "target": "30s"
+          },
+          "duration": 3900,
+          "until_lap_press": true
+        }
+      ],
+      "locales": [],
+      "options": {},
+      "distance": 0,
+      "duration": 3900,
+      "zoneTimes": [
+        {
+          "id": "Z1",
+          "max": 55,
+          "name": "Z1",
+          "secs": 0,
+          "zone": 1,
+          "color": "#009e80",
+          "maxWatts": 130,
+          "minWatts": 1,
+          "percentRange": "0% - 55%"
+        },
+        {
+          "id": "Z2",
+          "max": 75,
+          "name": "Z2",
+          "secs": 3900,
+          "zone": 2,
+          "color": "#009e00",
+          "maxWatts": 177,
+          "minWatts": 131,
+          "percentRange": "56% - 75%"
+        },
+        {
+          "id": "Z3",
+          "max": 90,
+          "name": "Z3",
+          "secs": 0,
+          "zone": 3,
+          "color": "#ffcb0e",
+          "maxWatts": 213,
+          "minWatts": 178,
+          "percentRange": "76% - 90%"
+        },
+        {
+          "id": "Z4",
+          "max": 105,
+          "name": "Z4",
+          "secs": 0,
+          "zone": 4,
+          "color": "#ff7f0e",
+          "maxWatts": 248,
+          "minWatts": 214,
+          "percentRange": "91% - 105%"
+        },
+        {
+          "id": "Z5",
+          "max": 120,
+          "name": "Z5",
+          "secs": 0,
+          "zone": 5,
+          "color": "#dd0447",
+          "maxWatts": 284,
+          "minWatts": 249,
+          "percentRange": "106% - 120%"
+        },
+        {
+          "id": "Z6",
+          "max": 150,
+          "name": "Z6",
+          "secs": 0,
+          "zone": 6,
+          "color": "#6633cc",
+          "maxWatts": 355,
+          "minWatts": 285,
+          "percentRange": "121% - 150%"
+        },
+        {
+          "id": "Z7",
+          "max": 999,
+          "name": "Z7",
+          "secs": 0,
+          "zone": 7,
+          "color": "#504861",
+          "maxWatts": 9999,
+          "minWatts": 356,
+          "percentRange": "151% +"
+        },
+        {
+          "id": "SS",
+          "gap": true,
+          "max": 97,
+          "min": 84,
+          "name": "Sweet Spot",
+          "secs": 0,
+          "zone": 8,
+          "color": "#ffa00e",
+          "maxWatts": 229,
+          "minWatts": 199,
+          "percentRange": "84% - 97%"
+        }
+      ],
+      "strain_score": {
+        "ss_cp": 63.99086757990852,
+        "ss_p_max": 0,
+        "ss_w_prime": 0,
+        "strain_score": 63.99086757990852
+      },
+      "average_watts": 154,
+      "normalized_power": 154,
+      "variability_index": 1,
+      "polarization_index": 0
+    },
+    "push_errors": null,
+    "athlete_cannot_edit": false,
+    "hide_from_athlete": false,
+    "structure_read_only": false,
+    "created_by_id": "i363885",
+    "shared_event_id": null,
+    "entered": false,
+    "carbs_per_hour": null,
+    "sub_type": null,
+    "distance": 0,
+    "tags": null,
+    "attachments": null,
+    "oauth_client_id": null,
+    "external_id": null,
+    "load_target": null,
+    "time_target": null,
+    "distance_target": null,
+    "training_availability": "NORMAL",
+    "max_training_time": null,
+    "can_train_sports": null,
+    "plan_athlete_id": null,
+    "plan_folder_id": null,
+    "plan_workout_id": null,
+    "plan_applied": null,
+    "icu_intensity": 65.16252,
+    "strain_score": 63.990868,
+    "plan_name": null,
+    "paired_activity_id": null
+  }
+]

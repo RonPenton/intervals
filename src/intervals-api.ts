@@ -10,6 +10,45 @@ const getQueryString = (query: Record<string, any>) => {
 export type ICUActivity = Required<paths['/api/v1/athlete/{id}/activities']['get']['responses']['200']['content']['*/*'][number]>;
 export type ICUWellness = Required<paths['/api/v1/athlete/{id}/wellness{ext}']['get']['responses']['200']['content']['*/*'][number]>;
 export type ICUPowerCurve = Required<components["schemas"]["DataCurve"]>;
+export type ICUEvent = components["schemas"]["Event"];
+
+export async function getPlannedWorkouts(
+    oldest: Temporal.PlainDate,
+    newest: Temporal.PlainDate,
+    athleteId = '0'
+): Promise<ICUEvent[]> {
+    const path = '/api/v1/athlete/{id}/events{format}';
+
+    type Get = paths[typeof path]['get'];
+    type Query = NonNullable<Get['parameters']['query']>;
+
+    const query: Query = {
+        oldest: oldest.toString(),
+        newest: newest.toString(),
+        category: ['WORKOUT'],
+    };
+
+    const queryString = getQueryString(query);
+    const url = `https://intervals.icu${path.replace('{id}', athleteId).replace('{format}', '')}${queryString}`;
+
+    const auth = `Basic ${Buffer.from(`API_KEY:${process.env.INTERVALS_API_KEY}`).toString('base64')}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        console.error('Error fetching planned workouts:', responseText);
+        throw new Error('Network response was not ok');
+    }
+
+    return response.json() as Promise<ICUEvent[]>;
+}
 
 export async function getRides(
     oldest: Temporal.PlainDate,

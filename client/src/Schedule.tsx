@@ -39,8 +39,10 @@ interface ScheduleResponse {
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr + "T00:00:00");
-  const day = date.toLocaleDateString("en-US", { weekday: "short" });
-  return `${day}, ${dateStr}`;
+  const day = date.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 2);
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  return `${day} ${m}/${d}`;
 }
 
 function formPercent(fitness: number, form: number) {
@@ -84,6 +86,21 @@ export default function Schedule() {
       .finally(() => setLoading(false));
   }, []);
 
+  function refreshSchedule() {
+    fetch("/api/schedule", { credentials: "include" })
+      .then((r) => r.json())
+      .then((scheduleData) => setData(scheduleData));
+  }
+
+  function putTargets(body: Record<string, any>) {
+    return fetch("/api/targets", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(refreshSchedule);
+  }
+
   function updateConstraint(date: string, field: "minMinutes" | "maxMinutes" | "minZone" | "maxZone", value: number | undefined) {
     setTargets((prev) => {
       const existing = prev[date] ?? {};
@@ -96,12 +113,7 @@ export default function Schedule() {
     const body = { ...current, [field]: value, date };
     if (value === undefined) delete (body as any)[field];
 
-    fetch("/api/targets", {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    putTargets(body);
   }
 
   function updateTargetType(date: string, newType: TargetType) {
@@ -115,7 +127,6 @@ export default function Schedule() {
         minZone: existing.minZone,
         maxZone: existing.maxZone,
       };
-      // Remove undefined constraint keys
       for (const k of Object.keys(cleared) as (keyof TargetValues)[]) {
         if (cleared[k] === undefined) delete cleared[k];
       }
@@ -134,12 +145,7 @@ export default function Schedule() {
       if (body[k] === undefined) delete body[k];
     }
 
-    fetch("/api/targets", {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    putTargets(body);
   }
 
   function updateTargetValue(date: string, targetType: TargetType, raw: string) {
@@ -148,7 +154,6 @@ export default function Schedule() {
 
     setTargets((prev) => {
       const existing = prev[date] ?? {};
-      // Clear other target fields, keep constraints
       const cleared: TargetValues = {
         minMinutes: existing.minMinutes,
         maxMinutes: existing.maxMinutes,
@@ -158,7 +163,6 @@ export default function Schedule() {
       if (parsed !== undefined) {
         (cleared as any)[targetType] = parsed;
       }
-      // Remove undefined keys
       for (const k of Object.keys(cleared) as (keyof TargetValues)[]) {
         if (cleared[k] === undefined) delete cleared[k];
       }
@@ -180,12 +184,7 @@ export default function Schedule() {
       if (body[k] === undefined) delete body[k];
     }
 
-    fetch("/api/targets", {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    putTargets(body);
   }
 
   if (loading) return <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}><CircularProgress /></Box>;
@@ -195,30 +194,33 @@ export default function Schedule() {
   const pastDays = data.schedules.filter((r): r is PastDay => !r.needsRide);
   const futureDays = data.schedules.filter((r): r is FutureDay => !!r.needsRide);
 
+  const hc = { fontWeight: "bold", color: "text.secondary" };
+  const dateCellSx = { fontFamily: "monospace" };
+
   return (
     <Box>
       <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
         FTP: {data.ftp}W
       </Typography>
 
-      <Typography variant="h6" gutterBottom>Past Week</Typography>
-      <TableContainer component={Paper} variant="outlined" sx={{ mb: 4 }}>
+      <TableContainer component={Paper} variant="outlined">
         <Table size="small">
           <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">CTL</TableCell>
-              <TableCell align="right">ATL</TableCell>
-              <TableCell align="right">Form</TableCell>
-              <TableCell align="right">Form%</TableCell>
-              <TableCell align="right">TSS</TableCell>
-              <TableCell align="right">Zone</TableCell>
+            <TableRow sx={{ backgroundColor: "action.hover" }}>
+              <TableCell sx={{ ...hc, minWidth: 90 }}>Date</TableCell>
+              <TableCell align="right" sx={hc}>CTL</TableCell>
+              <TableCell align="right" sx={hc}>ATL</TableCell>
+              <TableCell align="right" sx={hc}>Form</TableCell>
+              <TableCell align="right" sx={hc}>Form%</TableCell>
+              <TableCell align="right" sx={hc}>TSS</TableCell>
+              <TableCell align="right" sx={hc}>Zone</TableCell>
+              <TableCell colSpan={6} />
             </TableRow>
           </TableHead>
           <TableBody>
             {pastDays.map((row) => (
               <TableRow key={row.date}>
-                <TableCell>{formatDate(row.date)}</TableCell>
+                <TableCell sx={dateCellSx}>{formatDate(row.date)}</TableCell>
                 <TableCell align="right">{Math.round(row.fitness)}</TableCell>
                 <TableCell align="right">{Math.round(row.fatigue)}</TableCell>
                 <TableCell align="right">{Math.round(row.form)}</TableCell>
@@ -227,32 +229,28 @@ export default function Schedule() {
                 <TableCell align="right">
                   {row.zone ? <Chip label={`Z${row.zone}`} size="small" color="primary" variant="outlined" /> : "–"}
                 </TableCell>
+                <TableCell colSpan={6} />
               </TableRow>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
 
-      <Typography variant="h6" gutterBottom>Ride Options</Typography>
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">CTL</TableCell>
-              <TableCell align="right">ATL</TableCell>
-              <TableCell align="right">Form</TableCell>
-              <TableCell align="right">Form%</TableCell>
-              <TableCell align="right">Target TSS</TableCell>
-              <TableCell>Target Type</TableCell>
-              <TableCell>Target Value</TableCell>
-              <TableCell align="right">Min Mins</TableCell>
-              <TableCell align="right">Max Mins</TableCell>
-              <TableCell align="right">Min Zone</TableCell>
-              <TableCell align="right">Max Zone</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+            {futureDays.length > 0 && (
+              <TableRow sx={{ backgroundColor: "action.hover" }}>
+                <TableCell sx={{ ...hc, borderBottom: "none" }}>Date</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>CTL</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>ATL</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Form</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Form%</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>TSS</TableCell>
+                <TableCell sx={{ ...hc, borderBottom: "none" }} />
+                <TableCell sx={{ ...hc, borderBottom: "none" }}>Target Type</TableCell>
+                <TableCell sx={{ ...hc, borderBottom: "none" }}>Target Value</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Min Mins</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Max Mins</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Min Zone</TableCell>
+                <TableCell align="right" sx={{ ...hc, borderBottom: "none" }}>Max Zone</TableCell>
+              </TableRow>
+            )}
+
             {futureDays.map((row) => (
               <TargetRow
                 key={row.date}
